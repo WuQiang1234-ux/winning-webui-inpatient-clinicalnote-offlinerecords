@@ -1,15 +1,21 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
+import patientOverview from '../views/patientOverview'
 
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
-    name: 'Home',
-    component: Home
+    redirect: '/patientOverview',
+
   },
+  {
+    path: '/patientOverview',
+    name: 'patientOverview',
+    component: patientOverview,
+    children: []
+  }
   // {
   //   path: '/about',
   //   name: 'About',
