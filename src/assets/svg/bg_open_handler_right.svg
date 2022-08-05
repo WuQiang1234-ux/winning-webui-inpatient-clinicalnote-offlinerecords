@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="88px" viewBox="0 0 20 88" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>左</title>
+    <defs>
+        <path d="M577,442 L595.843841,461.050916 C596.584551,461.799766 597,462.810551 597,463.863845 L597,508.136155 C597,509.189449 596.584551,510.200234 595.843841,510.949084 L577,530 L577,530 L577,442 Z" id="path-1"></path>
+        <filter x="-5.0%" y="-1.1%" width="110.0%" height="102.3%" filterUnits="objectBoundingBox" id="filter-2">
+            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetInner1"></feOffset>
+            <feComposite in="shadowOffsetInner1" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="shadowInnerInner1"></feComposite>
+            <feColorMatrix values="0 0 0 0 0.788235294   0 0 0 0 0.788235294   0 0 0 0 0.788235294  0 0 0 1 0" type="matrix" in="shadowInnerInner1" result="shadowMatrixInner1"></feColorMatrix>
+            <feOffset dx="-1" dy="-1" in="SourceAlpha" result="shadowOffsetInner2"></feOffset>
+            <feComposite in="shadowOffsetInner2" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="shadowInnerInner2"></feComposite>
+            <feColorMatrix values="0 0 0 0 0.788235294   0 0 0 0 0.788235294   0 0 0 0 0.788235294  0 0 0 1 0" type="matrix" in="shadowInnerInner2" result="shadowMatrixInner2"></feColorMatrix>
+            <feMerge>
+                <feMergeNode in="shadowMatrixInner1"></feMergeNode>
+                <feMergeNode in="shadowMatrixInner2"></feMergeNode>
+            </feMerge>
+        </filter>
+    </defs>
+    <g id="A-病历主界面" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="窄屏-中间-1审签模式" transform="translate(-577.000000, -442.000000)">
+            <g id="左" transform="translate(587.000000, 486.000000) scale(-1, 1) translate(-587.000000, -486.000000) ">
+                <use fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-1"></use>
+                <use fill="black" fill-opacity="1" filter="url(#filter-2)" xlink:href="#path-1"></use>
+            </g>
+        </g>
+    </g>
+</svg>

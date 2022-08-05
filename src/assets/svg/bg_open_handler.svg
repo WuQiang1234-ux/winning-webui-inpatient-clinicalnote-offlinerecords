@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="88px" viewBox="0 0 20 88" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>右</title>
+    <g id="A-病历主界面" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="窄屏-中间-1审签模式" transform="translate(-625.000000, -447.000000)" fill="#FFFFFF">
+            <path d="M625,447 L643.843841,466.050916 C644.584551,466.799766 645,467.810551 645,468.863845 L645,513.136155 C645,514.189449 644.584551,515.200234 643.843841,515.949084 L625,535 L625,535 L625,447 Z" id="右"></path>
+        </g>
+    </g>
+</svg>

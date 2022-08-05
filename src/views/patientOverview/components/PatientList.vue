@@ -8,7 +8,7 @@
         :key="item.id"
       >{{item.name}}</li>
     </ul>
-    <div class="patient-list-add" @click="addPatient">新增 +</div>
+    <div class="patient-list-add" @click="addPatient">新 增</div>
   </div>
 </template>
 
@@ -74,13 +74,16 @@ export default {
   .patient-list-add {
     position: absolute;
     bottom: 0;
-    width: 200px;
+    width: 180px;
     background: #ccc;
     height: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
+    border: 1px solid #1d39c4;
+    left: 10px;
+    border-radius: 5px;
   }
 }
 </style>

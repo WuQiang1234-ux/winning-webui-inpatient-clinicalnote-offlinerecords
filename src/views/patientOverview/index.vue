@@ -47,7 +47,7 @@ export default {
         path: newPath,
         name: 'test',
         meta: { title: '患者' + newPatient.id, id: newPatient.id },
-        component: () => import('../InpatientEmrNavigatePanel/index.vue'),
+        component: () => import('../InpatientClinicalnoteMainPage/index.vue'),
       }
       this.$router.addRoute('patientOverview', routeObj)
       this.$router.push(newPath)
@@ -79,6 +79,11 @@ export default {
         width: 200px;
         height: 100%;
       }
+    }
+    .container-patient-content {
+      background: #ccc;
+      padding: 10px;
+      flex: 1;
     }
   }
 }

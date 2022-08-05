@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>下划线</title>
+    <g id="下划线" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect id="矩形" fill-rule="nonzero" x="0" y="0" width="16" height="16"></rect>
+        <path d="M13,13 L13,15 L3,15 L3,13 L13,13 Z M5,1 L5,7 C5,8.65685425 6.34314575,10 8,10 C9.59768088,10 10.9036609,8.75108004 10.9949073,7.17627279 L11,7 L11,1 L13,1 L13,7 C13,9.76142375 10.7614237,12 8,12 C5.23857625,12 3,9.76142375 3,7 L3,1 L5,1 Z" fill="#7E89A4"></path>
+    </g>
+</svg>
