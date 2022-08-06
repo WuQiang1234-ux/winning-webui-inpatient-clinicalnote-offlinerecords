@@ -8,17 +8,24 @@
 <script>
 import NavigatePanel from './InpatientEmrNavigatePanel/index.vue'
 import EditArea from './InpatientEmrEditArea/index.vue'
+import multi_clinicalnote_board_state from './mixins/multi_clinicalnote_board_state'
 export default {
   name: '',
   components: { NavigatePanel, EditArea },
   props: {},
+  mixins: [multi_clinicalnote_board_state],
   data() {
-    return {}
+    return {
+      id: null,
+    }
   },
+
   computed: {},
   watch: {},
   created() {},
-  mounted() {},
+  mounted() {
+    this.id = this.$router.currentRoute.params.id //只会执行一次
+  },
   methods: {},
 }
 </script>

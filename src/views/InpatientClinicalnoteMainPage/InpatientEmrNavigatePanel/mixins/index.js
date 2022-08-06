@@ -1,12 +1,8 @@
-import { createNamespacedHelpers } from 'vuex'
 import { ClinicalnoteTypes } from '@/components/MultiClinicalnoteBoard'
-const {
-  mapMutations: componentsMapMutations,
-  mapState: componentsMapStates,
-} = createNamespacedHelpers('components/multiClinicalnoteBoardState')
 import getEventHubHelper from '@/utils/event_hub_helper.js'
 let mixin = {
   components: {},
+  inject: ['currentActiveLoadedClinicalnote', 'loadedClinicalnoteList', 'addToLoadedClinicalnoteList', 'setCurrentActiveClinicalnoteById'],
   props: {
     publicParameters: {
       type: Object
@@ -19,11 +15,7 @@ let mixin = {
   computed: {
     currentEmrSetId() {
       return this.currentActiveLoadedClinicalnote?.options?.content?.emrSetId
-    },
-    ...componentsMapStates([
-      'currentActiveLoadedClinicalnote',
-      'loadedClinicalnoteList'
-    ]),
+    }
   },
   watch: {
     'currentActiveLoadedClinicalnote.id'(v) {
@@ -39,6 +31,10 @@ let mixin = {
   },
   created() {
     this.eventHubHelper = getEventHubHelper(this.$root.eventHub)
+    setInterval(() => {
+      console.log(this.currentActiveLoadedClinicalnote, this.loadedClinicalnoteList, '---', this.id)
+    }, 2000)
+
   },
   beforeDestroy() {
     this.eventHubHelper.destroy()
@@ -145,22 +141,6 @@ let mixin = {
         return v.id == id
       })
     },
-    // ...clinicalnoteMapMutations([
-    //   'showEmrCreateDialog',
-    //   'anyEmrCreated',
-    //   'deleteInLoadedEmrsData',
-    //   'setInpatEmrRecordId',
-    //   'setConsultationCreatorVisibility'
-    // ]),
-    ...componentsMapMutations([
-      'addToLoadedClinicalnoteList',
-      'setCurrentActiveClinicalnoteById',
-      // 'modifyClinicalnoteDataById',
-      // 'deleteInLoadedClinicalnoteListById',
-      // 'showClinicalnoteLoading',
-      // 'setCurrentEmrSetSerialId',
-      // 'showClinicalnoteProcessing'
-    ]),
   }
 }
 

@@ -44,9 +44,10 @@ export default {
       }
 
       const routeObj = {
-        path: newPath,
+        path: '/patientOverview/:id',
         name: 'test',
-        meta: { title: '患者' + newPatient.id, id: newPatient.id },
+        params: { id: newPatient.id },
+        meta: { id: newPatient.id },
         component: () => import('../InpatientClinicalnoteMainPage/index.vue'),
       }
       this.$router.addRoute('patientOverview', routeObj)
