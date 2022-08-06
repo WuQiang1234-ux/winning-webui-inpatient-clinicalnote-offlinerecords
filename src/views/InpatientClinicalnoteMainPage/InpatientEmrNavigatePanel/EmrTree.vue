@@ -36,8 +36,11 @@
 </template>
 
 <script>
+import { debounce } from '@/utils/index'
+import mixin from './mixins'
 export default {
   name: '',
+  mixins: [mixin],
   components: {},
   props: {},
   data() {
@@ -162,7 +165,43 @@ export default {
     },
     handleMouseEnter() {},
     handleContextMenu() {},
-    handleNodeClick() {},
+    //加防抖（修复连续点击树形控件会请求多次导致连续病历出现重复）
+    handleNodeClick: debounce(function (data) {
+      if (data.isRoot) return
+      //公共参数处理
+      if (!data.children) {
+        var params = {
+          inpEmrClassId: data.rawData.inpatEmrTypeId,
+          inpMrtId: data.rawData.inpatientMrtId,
+          inpatEmrSetId: data.id,
+        }
+      }
+      const { emrClass } = data
+
+      //console.log('什么鬼哦，怎么跟我没关系', emrClass)
+      if (emrClass == 'emrSet' || emrClass == 'consultationNote') {
+        //普通病历处理
+        this.openEmrSet(data, params)
+      } else if (emrClass == 'emrSetSerial') {
+        //处理连续病历
+        this.openEmrSetSerial(data, params)
+      } else if (emrClass == 'medicalRecord') {
+        //病案首页
+        this.openMedicalRecord(data, params)
+      } else if (emrClass == 'MedtechReportIpt') {
+        //医技报告
+        this.openMedtechReportIpt(data, params)
+      } else if (emrClass == 'InpCliSignOffOrder') {
+        //医嘱单
+        this.openInpCliSignOffOrder(data, params)
+      } else if (emrClass == 'HistoryApplyForm') {
+        //申请单
+        this.openHistoryApplyForm(data, params)
+      } else if (emrClass == 'DoctorReadingList') {
+        //护理文书
+        this.openDoctorReadingList(data, params)
+      }
+    }, 500),
   },
 }
 </script>

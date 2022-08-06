@@ -75,9 +75,9 @@
 
 <script>
 /*eslint no-undef: "error"*/
-import api from '@/api/list'
+// import api from '@/api/list'
 import InpatientClinicalnoteEditor from '../InpatientClinicalnoteEditor/index.vue'
-import MedicalRecordContainer from '../MedicalRecordContainer'
+// import MedicalRecordContainer from '../MedicalRecordContainer'
 import ConsultationEditor from '../InpatientClinicalnoteEditor/consultationEditor'
 import readonlyEditor from '../InpatientClinicalnoteEditor/readonlyEditor'
 import ArchiveReviewEditor from '../InpatientClinicalnoteEditor/ArchiveReviewEditor'
@@ -93,7 +93,7 @@ import { createNamespacedHelpers } from 'vuex'
 const {
   mapState: componentsMapStates,
   mapGetters: componentsMapGetters,
-  mapMutations: componentsMapMutations
+  mapMutations: componentsMapMutations,
 } = createNamespacedHelpers('components/multiClinicalnoteBoardState')
 
 import { createEventKeyWithNamespace } from '@/utils/event_hub_helper.js'
@@ -112,7 +112,7 @@ export const ClinicalnoteTypes = {
   HISTORY_APPLY_FORM: 'HISTORY_APPLY_FORM',
   DOCTOR_READING_LIST: 'DOCTOR_READING_LIST',
   NURSE_VIEW: 'NURSE_VIEW',
-  OUTPATIENT_EDITOR: 'OUTPATIENT_EDITOR'
+  OUTPATIENT_EDITOR: 'OUTPATIENT_EDITOR',
 }
 import getEventHubHelper from '@/utils/event_hub_helper.js'
 const createEventKey = createEventKeyWithNamespace(
@@ -121,14 +121,14 @@ const createEventKey = createEventKeyWithNamespace(
 export const MultiClinicalnoteBoardEventKeys = {
   TAB_ADD: createEventKey('TAB_ADD'),
   //TAB_REMOVE: createEventKey('TAB_REMOVE'),
-  TAB_CLICK: createEventKey('TAB_CLICK')
+  TAB_CLICK: createEventKey('TAB_CLICK'),
 }
 
 export default {
   name: 'MultiClinicalnoteBoard',
   components: {
     InpatientClinicalnoteEditor,
-    MedicalRecordContainer,
+    // MedicalRecordContainer,
     ConsultationEditor,
     readonlyEditor,
     ArchiveReviewEditor,
@@ -139,7 +139,7 @@ export default {
     DoctorReadingList,
     nurseView,
     OutpatientEditor,
-    HistoryApplyForm
+    HistoryApplyForm,
   },
   data() {
     return {
@@ -147,19 +147,19 @@ export default {
         '399297352',
         '399297355',
         '399297356',
-        '399442431'
-      ] //暂存、提交、撤销提交、取消
+        '399442431',
+      ], //暂存、提交、撤销提交、取消
     }
   },
   computed: {
     ...componentsMapStates([
       'clinicalnoteProcessing',
       'loadedClinicalnoteList',
-      'currentActiveLoadedClinicalnote'
+      'currentActiveLoadedClinicalnote',
     ]),
     ...componentsMapGetters([
       'loadedClinicalnoteIdList',
-      'currentActiveLoadedClinicalnoteId'
+      'currentActiveLoadedClinicalnoteId',
     ]),
     clinicalnoteTypes() {
       return ClinicalnoteTypes
@@ -168,8 +168,8 @@ export default {
       get() {
         return this.currentActiveLoadedClinicalnoteId
       },
-      set() {}
-    }
+      set() {},
+    },
   },
   created() {
     this.eventHubHelper = getEventHubHelper(this.$root.eventHub)
@@ -190,10 +190,10 @@ export default {
     ...componentsMapMutations([
       'setCurrentActiveClinicalnoteById',
       'deleteInLoadedClinicalnoteListById',
-      'clearLoadedClinicalnoteList'
+      'clearLoadedClinicalnoteList',
     ]),
     async handleDoDelete(id) {
-      let _target = this.loadedClinicalnoteList.find(v => {
+      let _target = this.loadedClinicalnoteList.find((v) => {
         return v.id == id
       })
 
@@ -218,9 +218,9 @@ export default {
       if (_target) {
         let inpatEmrSetId = this.getEmrSetId(_target)
         // 通知后端关闭了该病历
-        if (!inpatEmrSetId.includes('readonly')) {
-          await api.apiColseCasHistory({ inpatEmrSetId })
-        }
+        // if (!inpatEmrSetId.includes('readonly')) {
+        //   await api.apiColseCasHistory({ inpatEmrSetId })
+        // }
       }
       window.eventBus.$emit(
         'qualityCntrolActivateMedicalHistoryData',
@@ -265,7 +265,7 @@ export default {
       let id = this.getEmrSetId(currentClinicalnote)
       this.eventHubHelper.emit(MultiClinicalnoteBoardEventKeys.TAB_CLICK, {
         id,
-        typeId: currentClinicalnote.emrTypeId
+        typeId: currentClinicalnote.emrTypeId,
       })
     },
 
@@ -283,8 +283,8 @@ export default {
         ClinicalnoteEditorEventKeys.HANDLE_CLOSE_CLINICALNOTE,
         emrSetId
       )
-    }
-  }
+    },
+  },
 }
 </script>
 

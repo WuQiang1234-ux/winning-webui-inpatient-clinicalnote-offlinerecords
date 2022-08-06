@@ -1,14 +1,14 @@
 <template>
   <div class="inpatient-emr-edit-area-wrap">
-    <MultiClinicalnoteBoard></MultiClinicalnoteBoard>
+    <!-- <MultiClinicalnoteBoard></MultiClinicalnoteBoard> -->
   </div>
 </template>
 
 <script>
-import MultiClinicalnoteBoard from '@/components/MultiClinicalnoteBoard'
+// import MultiClinicalnoteBoard from '@/components/MultiClinicalnoteBoard'
 export default {
   name: '',
-  components: { MultiClinicalnoteBoard },
+  components: {},
   props: {},
   data() {
     return {}

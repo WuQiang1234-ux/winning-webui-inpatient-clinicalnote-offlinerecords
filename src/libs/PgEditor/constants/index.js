@@ -1,0 +1,104 @@
+export * from './data_element_win_ids'
+export * from './diagnosis_types'
+
+export const PgEditorProvideKeys = {
+  PG_EDITOR_STORE: 'PG_EDITOR_STORE',
+  PG_EDITOR_EVENT_EMITTER: 'PG_EDITOR_EVENT_EMITTER'
+}
+
+export const ClassNamespace = 'pg-editor'
+
+export const DcEditorRenderModes = {
+  SET_WORK_MODE_DESIGN: 'SetWorkMode_Design',//设计模式  业务这边仅用于调试，请勿乱用
+  SET_WORK_MODE_APP: 'SetWorkMode_App', //应用模式
+  SET_WORK_MODE_BROWSE: 'SetWorkMode_Browse', //浏览模式
+  SET_PRINT_PREVIEW: 'SetPrintPreview', //打印预览模式
+  A_SETVIEWMODE_WEB: 'A_SetViewMode_Web', //web模式
+  SET_WORK_MODE_KEEP_TRACE: 'SetWorkMode_KeepTrace' //痕迹模式
+}
+export const EditorState = {
+  WILDERNESS: 'WILDERNESS',
+  EDITOR_LOADING: 'EDITOR_LOADING',
+  EDITOR_LOADED: 'EDITOR_LOADED',
+  DOC_LOADING: 'DOC_LOADING',
+  DOC_LOADED: 'DOC_LOADED',
+  SUB_DOCS_INSERTING: 'SUB_DOCS_INSERTING',
+  SUB_DOCS_INSERTED: 'SUB_DOCS_INSERTED'
+}
+
+export const EditorEvent = {
+  ...EditorState,
+  EDITOR_CONTENT_RENDER_MODE_CHANGE: 'EDITOR_CONTENT_RENDER_MODE_CHANGE',
+  EDITOR_EDITABLE: 'EDITOR_EDITABLE',
+  EDITOR_STATE_CHANGE: 'EDITOR_STATE_CHANGE',
+
+  PG_EVENT_XML_ONLOAD: 'PG_EVENT_XML_ONLOAD',
+  PG_EVENT_PAGE_ONLOAD: 'PG_EVENT_PAGE_ONLOAD',
+  PG_EVENT_XML_OPEN_ERROR: 'PG_EVENT_XML_OPEN_ERROR',
+  PG_EVENT_INPUT_ACTIVE: 'PG_EVENT_INPUT_ACTIVE',
+  PG_EVENT_BUTTON_CLICK: 'PG_EVENT_BUTTON_CLICK',
+  PG_EVENT_RIGHT_PROPERTY: 'PG_EVENT_RIGHT_PROPERTY',
+  PG_EVENT_SAVE_AS_TEXT: 'PG_EVENT_SAVE_AS_TEXT',
+  PG_EVENT_INPUT_CHANGE: 'PG_EVENT_INPUT_CHANGE',
+  PG_EVENT_UPDATE_TEETH: 'PG_EVENT_UPDATE_TEETH',
+  PG_EVENT_UPDATE_SYNC_IMAGE: 'PG_EVENT_UPDATE_SYNC_IMAGE',
+  PG_EVENT_INPUT_CLICK: 'PG_EVENT_INPUT_CLICK',
+  PG_EVENT_ON_CURSOR_CHANGED: 'PG_EVENT_ON_CURSOR_CHANGED',
+  PG_EVENT_HOVER_PARAGRAPH: 'PG_EVENT_HOVER_PARAGRAPH',
+
+  PG_EVENT_DIAGNOSIS_MENU_CLICK: 'PG_EVENT_DIAGNOSIS_MENU_CLICK',
+  PG_EVENT_REFRESH_DIAGNOSIS: 'PG_EVENT_REFRESH_DIAGNOSIS',
+  PG_EVENT_DIAGNOSIS_DIALOG_CLOSE: 'PG_EVENT_DIAGNOSIS_DIALOG_CLOSE',
+  PG_EVENT_APPLICATION_INFORMATION: 'DC_EVENT_APPLICATION_INFORMATION',
+  PG_EVENT_RIGHT_COLLECT: 'PG_EVENT_RIGHT_COLLECT',
+  PG_EVENT_RIGHT_PHRASE_REFERENCE: 'PG_EVENT_RIGHT_PHRASE_REFERENCE',
+  PG_EVENT_RIGHT_AUTOMATIC_GENERATION: 'PG_EVENT_RIGHT_AUTOMATIC_GENERATION',
+  PG_EVENT_SAVE_PERSONAL_TEMPLATE: 'PG_EVENT_SAVE_PERSONAL_TEMPLATE',
+
+  PG_EVENT_IMAGE_SET_VALUE: 'PG_EVENT_IMAGE_SET_VALUE', //签名插入图片回调
+  PG_EVENT_PRINT_DOCUMENT: 'DC_EVENT_PRINT_DOCUMENT', //打印
+  PG_EVENT_UPDATE_DRAFTER: 'PG_EVENT_UPDATE_DRAFTER', //更改病历起草者
+
+  PG_EVENT_INPUT_ON_BLUR: 'PG_EVENT_INPUT_ON_BLUR',
+  PG_EVENT_BEFORE_RIGHT_MENU: 'PG_EVENT_BEFORE_RIGHT_MENU',
+  PG_EVENT_INPUT_MOUSE_CLICK: 'PG_EVENT_INPUT_MOUSE_CLICK',
+
+  PG_EVENT_SET_SUBSTITUTE_SIGNATURE: 'PG_EVENT_SET_SUBSTITUTE_SIGNATURE',
+
+  PG_EVENT_SET_TAG: 'PG_EVENT_SET_TAG',
+  PG_EVENT_REMOVE_TAG: 'PG_EVENT_REMOVE_TAG',
+  PG_EVENT_SCALE: 'PG_EVENT_SCALE',
+  PG_EVENT_REFRESH_CLINICALNOTE: 'PG_EVENT_REFRESH_CLINICALNOTE',
+
+  PG_EVENT_AFTER_SET_PRINT_PREVIEW: 'PG_EVENT_AFTER_SET_PRINT_PREVIEW',
+  PG_EVENT_DOC_CHANGED: 'PG_EVENT_DOC_CHANGED',
+  PG_EVENT_ANNOTATION: 'PG_EVENT_ANNOTATION',
+  PG_EVENT_ANNOTATION_VIEWPORT: 'PG_EVENT_ANNOTATION_VIEWPORT',
+  PG_EVENT_PRINT_PREVIEW_CLICK: 'PG_EVENT_PRINT_PREVIEW_CLICK',
+  PG_QUALITY_CONTROL_MENTION_DEFECTS: 'PG_QUALITY_CONTROL_MENTION_DEFECTS',
+  PG_EVENT_BROWSE_RClick: 'PG_EVENT_BROWSE_RClick'
+}
+
+export const EditorCommand = {}
+/*
+ *   960074 新建
+ *   390030405 草稿
+ *   399297358 审签驳回
+ *   399017130 审签中
+ *   390030407L 审签通过
+ *   399297355 已提交
+ *   399291265 已召回
+ */
+
+export const TagImage = {
+  '960074': require('../assets/svg/reviewStatus/created.svg'), //新建 wicon-stamp-xinjian-lan
+  '390030405': require('../assets/svg/reviewStatus/draft.svg'), // 草稿 wicon-stamp-caogao-lan
+  '399297355': require('../assets/svg/reviewStatus/submited.svg'), // 已提交-->待审核    wicon-stamp-yitijiao-lan
+  // '390032002': require('../assets/svg/reviewStatus/reviewing.svg'), // 审签中
+  '399017130': require('../assets/svg/reviewStatus/reviewing.svg'), // 审签中   wicon-stamp-shenqianzhong-lan
+  '390030407': require('../assets/svg/reviewStatus/reviewSuccess.svg'), // 审签通过  wicon-stamp-shenqiantongguo-lv
+  '399297358': require('../assets/svg/reviewStatus/reviewReject.svg'), // 审签驳回  wicon-stamp-shenhebohui-hong
+  '399291265': require('../assets/svg/reviewStatus/hasRecalled.svg'), // 已召回 wicon-stamp-yizhaohui-cheng
+  '399572897': require('../assets/svg/reviewStatus/safeKeeping.svg'), // 已封存 wicon-stamp-yifengcun-hong
+  '399572894': require('../assets/svg/reviewStatus/printedLocked.svg') // 已打印锁定 wicon-stamp-dayinsuoding-hong
+}
