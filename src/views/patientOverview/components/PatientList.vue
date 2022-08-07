@@ -2,10 +2,11 @@
   <div class="patient">
     <ul class="patient-list">
       <li
-        class="patient-list-item"
+        ref="patientListItem"
+        :class="['patient-list-item',{activeStyle:item.encounterId==currentActiveLoadedPatient.encounterId}]"
         v-for="item in patientList"
         @click="patientChange(item)"
-        :key="item.id"
+        :key="item.encounterId"
       >{{item.name}}</li>
     </ul>
     <div class="patient-list-add" @click="addPatient">新 增</div>
@@ -23,18 +24,35 @@ export default {
   data() {
     return {}
   },
-  computed: { ...patientInfoMapState(['patientList']) },
+  computed: {
+    ...patientInfoMapState(['patientList', 'currentActiveLoadedPatient']),
+  },
   watch: {},
   created() {},
   mounted() {
-    console.log(this.patientList)
+    let patientListItem = this.$refs.patientListItem
+    console.log(patientListItem)
+    if (patientListItem.length) {
+      console.log('有患者')
+      let dom = patientListItem[0]
+
+      this.setCurrentActiveLoadedPatient(this.patientList[0].encounterId)
+      dom.click()
+    }
+    setInterval(() => {
+      console.log(this.currentActiveLoadedPatient, '当前患者')
+    }, 2000)
   },
   methods: {
-    ...patientInfoMapMutations(['addPatientList']),
+    ...patientInfoMapMutations([
+      'addPatientList',
+      'setCurrentActiveLoadedPatient',
+    ]),
     addPatient() {
       this.addPatientList()
     },
     patientChange(item) {
+      this.setCurrentActiveLoadedPatient(item.encounterId)
       this.$emit('patientChange', item)
     },
   },
@@ -69,6 +87,10 @@ export default {
         background: #eaeefe;
         color: #1d39c4;
       }
+    }
+    .activeStyle {
+      background: #eaeefe;
+      color: #1d39c4;
     }
   }
   .patient-list-add {

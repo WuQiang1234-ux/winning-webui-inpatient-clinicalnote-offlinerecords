@@ -13,9 +13,13 @@ let mixin = {
     return {
       currentActiveLoadedClinicalnote: {},
       loadedClinicalnoteList: [],
+      areaEncounterId: null //当前区域的患者id
     }
   },
   created() {
+  },
+  mounted() {
+    this.areaEncounterId = this.$router.currentRoute.params.id //只会执行一次
   },
   methods: {
     addToLoadedClinicalnoteList(payload) {

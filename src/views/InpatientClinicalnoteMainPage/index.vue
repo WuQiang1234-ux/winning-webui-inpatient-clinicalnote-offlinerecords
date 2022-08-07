@@ -1,5 +1,5 @@
 <template>
-  <div class="inpatient-emr-index-wrap">
+  <div class="inpatient-emr-index-wrap" element-loading-text="加载中" v-loading="patientLoding">
     <navigate-panel></navigate-panel>
     <edit-area class="inpatient-emr-editor"></edit-area>
   </div>
@@ -16,16 +16,19 @@ export default {
   mixins: [multi_clinicalnote_board_state],
   data() {
     return {
-      id: null,
+      patientLoding: false,
     }
   },
-
+  created() {
+    this.patientLoding = true
+  },
+  mounted() {
+    setTimeout(() => {
+      this.patientLoding = false
+    }, 200)
+  },
   computed: {},
   watch: {},
-  created() {},
-  mounted() {
-    this.id = this.$router.currentRoute.params.id //只会执行一次
-  },
   methods: {},
 }
 </script>

@@ -20,6 +20,7 @@ let mixin = {
   watch: {
     'currentActiveLoadedClinicalnote.id'(v) {
       if (v) {
+        console.log('改了')
         // if (this.activateMenu == 'emr_tree') {
         this.treeDefaultExpandedKeys = []
         this.treeDefaultExpandedKeys?.push(
@@ -31,9 +32,7 @@ let mixin = {
   },
   created() {
     this.eventHubHelper = getEventHubHelper(this.$root.eventHub)
-    setInterval(() => {
-      console.log(this.currentActiveLoadedClinicalnote, this.loadedClinicalnoteList, '---', this.id)
-    }, 2000)
+
 
   },
   beforeDestroy() {

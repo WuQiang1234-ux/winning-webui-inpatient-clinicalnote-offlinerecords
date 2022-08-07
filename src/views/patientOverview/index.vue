@@ -8,7 +8,7 @@
         <div class="container-letft-patient-list">
           <patient-list @patientChange="patientChange"></patient-list>
         </div>
-        <div class="container-patient-content">
+        <div class="container-patient-content" v-loding="patientLoding">
           <keep-alive>
             <router-view :key="$route.fullPath" />
           </keep-alive>
@@ -24,17 +24,24 @@ import PatientList from './components/PatientList'
 export default {
   name: 'patientOverview',
   components: { HeaderPatientsDetails, PatientList },
+  data() {
+    return {
+      patientLoding: false,
+    }
+  },
   methods: {
     patientChange(newPatient) {
       let oldPathFlag = false //是否已经有了该路由
-      let skip = true //是否跳转
-      let newPath = '/patientOverview/' + newPatient.id
+      let skip = true //是否允许跳转
+
+      let encounterId = newPatient.encounterId
+      let newPath = '/patientOverview/' + encounterId
       this.$router.getRoutes().forEach((item) => {
-        if (item.meta?.id == newPatient.id) {
+        if (item.meta?.encounterId == encounterId) {
           oldPathFlag = true
-          if (this.$route.path == newPath) {
-            skip = false
-          }
+        }
+        if (item.meta?.encounterId == encounterId) {
+          skip = false
         }
       })
       if (!skip) return
@@ -44,10 +51,10 @@ export default {
       }
 
       const routeObj = {
-        path: '/patientOverview/:id',
-        name: 'test',
-        params: { id: newPatient.id },
-        meta: { id: newPatient.id },
+        path: '/patientOverview/:encounterId',
+        name: '',
+        params: { encounterId },
+        meta: { encounterId },
         component: () => import('../InpatientClinicalnoteMainPage/index.vue'),
       }
       this.$router.addRoute('patientOverview', routeObj)
