@@ -9,7 +9,6 @@
       :personalTemplateRightMenuFlag="personalTemplateRightMenuFlag"
       :isAddMinWidth="isAddMinWidth"
       :editoroptionInitialConfiguration="editoroptionInitialConfiguration"
-      @ImageLoadError="ImageLoadError"
     ></Editor>
   </div>
 </template>
@@ -25,8 +24,8 @@ export * as Constants from './constants'
 // /*global $:true*/
 /* eslint-disable no-undef */
 // import _ from 'lodash';
-import calendarClass from '@/libs/PgEditor/utils/calendar'
-import { getMacAddress, getIpAddress } from '@winex-utils/his-dll'
+// import calendarClass from '@/libs/PgEditor/utils/calendar'
+// import { getMacAddress, getIpAddress } from '@winex-utils/his-dll'
 
 import {
   ClassNamespace,
@@ -34,22 +33,19 @@ import {
   // DataElementWinIds,
   DcEditorRenderModes,
 } from './constants'
-import { cb2promise } from '@/utils/convertFunction'
+// import { cb2promise } from '@/utils/convertFunction'
 import mixins from './mixins'
 import Editor from './editor'
-import DiagnosisHelper from './helper/diagnosis_helper'
-import SignatureHelper, {
-  ConsultationSignatureHelper,
-} from './helper/signature_helper'
-import { mapState, createNamespacedHelpers } from 'vuex'
+// import DiagnosisHelper from './helper/diagnosis_helper'
+// import SignatureHelper, {
+//   ConsultationSignatureHelper,
+// } from './helper/signature_helper'
 // import { decompress } from '../../components/InpatientClinicalnoteEditor/BaseEditorPg/utils'
-const { mapState: globalConfigMapStates, mapActions: globalConfigActions } =
-  createNamespacedHelpers('globalConfig')
 
 // 兼容乾坤聚合，子应用间通信
-if (!window.eventBus) {
-  window.eventBus = Vue.prototype.eventBus = new Vue()
-}
+// if (!window.eventBus) {
+//   window.eventBus = Vue.prototype.eventBus = new Vue()
+// }
 
 console.log('PgEditor开始加载了')
 
@@ -80,19 +76,19 @@ export default {
     patientInfo: {
       type: Object,
       default: function () {
-        return null
+        return {}
       },
     },
     userInfo: {
       type: Object,
       default: function () {
-        return null
+        return {}
       },
     },
     orgInfo: {
       type: Object,
       default: function () {
-        return null
+        return {}
       },
     },
 
@@ -143,8 +139,6 @@ export default {
     }
   },
   computed: {
-    ...mapState(['currentPatientInfo', 'qualityControlData']),
-    ...globalConfigMapStates(['pageConfig']),
     classNames() {
       return {
         editorContainer: `${this.classNamespace}-container`,
@@ -187,7 +181,17 @@ export default {
   created() {
     this.pgEditorInstance = null // 保存编辑器实例
   },
-  mounted() {},
+  mounted() {
+    const editorTarget = this.$refs.editorTarget
+    if (this.pgEditorLoaded) {
+      this.pgEditorInstance = editorTarget.pgEditor
+    } else {
+      this.eventEmitter.$once(EditorEvent.PG_EVENT_PAGE_ONLOAD, () => {
+        this.pgEditorInstance = editorTarget.pgEditor
+        this.pgEditorLoaded = true
+      })
+    }
+  },
   methods: {
     waitEditorLoaded() {
       return new Promise((resolve) => {

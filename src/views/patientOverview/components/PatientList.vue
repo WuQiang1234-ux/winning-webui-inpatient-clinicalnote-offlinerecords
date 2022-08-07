@@ -39,9 +39,6 @@ export default {
       this.setCurrentActiveLoadedPatient(this.patientList[0].encounterId)
       dom.click()
     }
-    setInterval(() => {
-      console.log(this.currentActiveLoadedPatient, '当前患者')
-    }, 2000)
   },
   methods: {
     ...patientInfoMapMutations([

@@ -36,7 +36,9 @@
 </template>
 
 <script>
+import dayjs from 'dayjs'
 import { debounce } from '@/utils/index'
+import { treeData } from './aa'
 import mixin from './mixins'
 export default {
   name: '',
@@ -57,111 +59,79 @@ export default {
   },
   methods: {
     setClinicalnoteTreeData() {
-      this.clinicalnoteTreeData = [
-        {
-          id: '121383422926546945',
-          label: '入院记录',
-          emrClass: 'emrSet',
-          isRoot: true,
-          children: [
-            {
-              id: '241617551325681665',
-              label: '儿科入院记录',
-              createTime: '07-26',
-              fullTime: '2022-07-26 17:18:56',
-              emrTypeId: '121383422926546945',
-              emrTypeName: '入院记录',
-              defaultStatusCode: '399297355',
-              currentStatusCode: '399297355',
-              emrClass: 'emrSet',
-              loading: false,
-              isFullLength: false,
-              isShowLigature: false,
-              rawData: {
-                inpatEmrSetId: '241617551325681665',
-                inpatientMrtId: '218188994333458436',
-                inpatEmrTypeId: '121383422926546945',
-                inpatEmrSetTitle: '儿科入院记录',
-                inpatEmrSetListTitle: '儿科入院记录',
-                inpatEmrSetFileTime: '2022-07-26 17:18:56',
-                inpatEmrSetStatusCode: '390030407',
-                printedCount: null,
-                printed: false,
-                printMaxCount: null,
-                inpEmrReviewLevelCode: null,
-                createdBy: '57393570602543106',
-                createdByName: '刘金兰',
-                writeSelf: false,
-                seriesFlag: null,
-                showYear: null,
-                showTimePattern: null,
-                operationLimitCode: null,
-                expertiseCode: null,
-                inpEmrDoctorId: null,
-                inpatientMrtTypeId: '125044678493294618',
-                inpMrtMonitorId: '125044678493294618',
-                inpEmrDisplayStatusCode: '399297355',
-                inpEmrDisplayStatusName: '提交',
-                emrSourceCode: null,
-                myDeptCreated: true,
-                emrQcEmrSetOutputVO: null,
-                printLockFlag: null,
-                sealedStatus: null,
-                casePrintStatus: null,
-                caseSpecialPermissionStatus: null,
-                encDeptId: '57397322256476163',
-                encDeptName: '骨科',
-              },
-            },
-          ],
-          rawData: {
-            inpatientEmrTypeId: '121383422926546945',
-            inpatientEmrTypeName: '入院记录',
-            seriesFlag: '98176',
-            seqNo: 1,
-            emrSetList: [
-              {
-                inpatEmrSetId: '241617551325681665',
-                inpatientMrtId: '218188994333458436',
-                inpatEmrTypeId: '121383422926546945',
-                inpatEmrSetTitle: '儿科入院记录',
-                inpatEmrSetListTitle: '儿科入院记录',
-                inpatEmrSetFileTime: '2022-07-26 17:18:56',
-                inpatEmrSetStatusCode: '390030407',
-                printedCount: null,
-                printed: false,
-                printMaxCount: null,
-                inpEmrReviewLevelCode: null,
-                createdBy: '57393570602543106',
-                createdByName: '刘金兰',
-                writeSelf: false,
-                seriesFlag: null,
-                showYear: null,
-                showTimePattern: null,
-                operationLimitCode: null,
-                expertiseCode: null,
-                inpEmrDoctorId: null,
-                inpatientMrtTypeId: '125044678493294618',
-                inpMrtMonitorId: '125044678493294618',
-                inpEmrDisplayStatusCode: '399297355',
-                inpEmrDisplayStatusName: '提交',
-                emrSourceCode: null,
-                myDeptCreated: true,
-                emrQcEmrSetOutputVO: null,
-                printLockFlag: null,
-                sealedStatus: null,
-                casePrintStatus: null,
-                caseSpecialPermissionStatus: null,
-                encDeptId: '57397322256476163',
-                encDeptName: '骨科',
-              },
-            ],
-            incompleteDocList: null,
-            lockActionVOList: null,
-            myDeptCreated: true,
-          },
-        },
-      ]
+      this.clinicalnoteTreeData = this.filterClinicalnoteTreeData(treeData.data)
+    },
+    filterClinicalnoteTreeData(data) {
+      // let hasAnyEmrCreated = false
+      return data
+        .map((item) => {
+          // 病历树，节点属性
+          let emrClass = 'emrSet'
+          //seriesFlag是否连续 98175连续（病程）   98176不连续
+          if (item.seriesFlag == '98175') {
+            // 连续病程
+            emrClass = 'emrSetSerial'
+          }
+          if (item.inpatientEmrTypeId == '121383422926546960') {
+            //病案首页
+            // return undefined
+            emrClass = 'medicalRecord'
+          } else if (item.inpatientEmrTypeId == '121383422926546950') {
+            //会诊记录
+            emrClass = 'consultationNote'
+          }
+          item.myDeptCreated = true
+          let clinicalnoteList = []
+
+          if (item?.emrSetList?.length) {
+            this.showQualityControl &&
+              (item.defectCount = item.emrSetList.reduce((total, data) => {
+                return total + data?.emrQcEmrSetOutputVO?.defectCount || 0
+              }, 0))
+            // hasAnyEmrCreated = true
+            clinicalnoteList = item.emrSetList.map((cItem) => {
+              if (
+                this.showQualityControl &&
+                cItem?.emrQcEmrSetOutputVO?.defectCount
+              ) {
+                cItem.defectCount = cItem.emrQcEmrSetOutputVO.defectCount
+                item.defectCount = cItem.emrQcEmrSetOutputVO.defectCount
+              }
+              //根据参数设置时间格式
+              let createTime = cItem.inpatEmrSetFileTime
+              createTime = dayjs(createTime).format('YYYY-MM-DD HH:mm:ss')
+              return {
+                id: cItem.inpatEmrSetId,
+                label: cItem.inpatEmrSetListTitle,
+                createTime,
+                fullTime: cItem.inpatEmrSetFileTime,
+                emrTypeId: item.inpatientEmrTypeId,
+                emrTypeName: item.inpatientEmrTypeName,
+                defaultStatusCode: cItem.inpEmrDisplayStatusCode,
+                currentStatusCode: cItem.inpEmrDisplayStatusCode,
+                emrClass,
+                loading: false,
+                isFullLength: false,
+                defectCount: cItem.defectCount,
+                rawData: cItem,
+              }
+            })
+          }
+          // this.anyEmrCreated(hasAnyEmrCreated)
+
+          this.treeLoading = false
+          return {
+            id: item.inpatientEmrTypeId,
+            label: item.inpatientEmrTypeName,
+            emrClass,
+            isRoot: true,
+            children: clinicalnoteList,
+            rawData: item,
+            defectCount: item.defectCount,
+            // aaaa: 'ss'
+          }
+        })
+        ?.filter((el) => el)
     },
     handleMouseEnter() {},
     handleContextMenu() {},

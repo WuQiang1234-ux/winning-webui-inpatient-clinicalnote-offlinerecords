@@ -5,7 +5,7 @@ export const formulaElementTypes = [
   'FourValues', //月经公式1
   'FourValues1', //月经公式2
   'FourValues2', //月经公式3
-  'ThreeValues' //月经公式4
+  'ThreeValues', //月经公式4
   // "Pupil",//瞳孔图
   // "LightPositioning",//光定位图
   // "FetalHeart",//胎心图
@@ -18,7 +18,7 @@ export const myCptId = {
   PERIOD: '0003', //周期
   AGE_OF_MENOPAUSE: '0004', //绝经年龄
   AGE_OF_MENARCHE_DATE_TAPE: '0005', //初潮年龄是否使用日期
-  AGE_OF_MENOPAUSE_DATE_TAPE: '0006' //绝经年龄是否使用日期
+  AGE_OF_MENOPAUSE_DATE_TAPE: '0006', //绝经年龄是否使用日期
 }
 export function getFormulaElementListWithAttr(data) {
   let arr = []
@@ -29,40 +29,40 @@ export function getFormulaElementListWithAttr(data) {
           cptId: myCptId.MENSTRUATION_FIGURE + myCptId.AGE_OF_MENARCHE,
           name: '初潮年龄',
           InnerValue: data.value1,
-          titleCptId: data.titleCptId
+          titleCptId: data.titleCptId,
         },
         {
           cptId: myCptId.MENSTRUATION_FIGURE + myCptId.MENSTRUAL_PERIOD,
           name: '经期',
           InnerValue: data.value2,
-          titleCptId: data.titleCptId
+          titleCptId: data.titleCptId,
         },
         {
           cptId: myCptId.MENSTRUATION_FIGURE + myCptId.PERIOD,
           name: '周期',
           InnerValue: data.value3,
-          titleCptId: data.titleCptId
+          titleCptId: data.titleCptId,
         },
         {
           cptId: myCptId.MENSTRUATION_FIGURE + myCptId.AGE_OF_MENOPAUSE,
           name: '绝经年龄',
           InnerValue: data.value4,
-          titleCptId: data.titleCptId
+          titleCptId: data.titleCptId,
         },
         {
           cptId:
             myCptId.MENSTRUATION_FIGURE + myCptId.AGE_OF_MENARCHE_DATE_TAPE,
           name: '初潮年龄是否使用日期',
           InnerValue: data.value5,
-          titleCptId: data.titleCptId
+          titleCptId: data.titleCptId,
         },
         {
           cptId:
             myCptId.MENSTRUATION_FIGURE + myCptId.AGE_OF_MENOPAUSE_DATE_TAPE,
           name: '绝经年龄是否使用日期',
           InnerValue: data.value6,
-          titleCptId: data.titleCptId
-        }
+          titleCptId: data.titleCptId,
+        },
       ]
       break
     case 'FourValues1': //月经公式2
@@ -71,26 +71,26 @@ export function getFormulaElementListWithAttr(data) {
           cptId: myCptId.MENSTRUATION_FIGURE + myCptId.AGE_OF_MENARCHE,
           name: '初潮年龄',
           InnerValue: data.value1,
-          titleCptId: data.titleCptId
+          titleCptId: data.titleCptId,
         },
         {
           cptId: myCptId.MENSTRUATION_FIGURE + myCptId.MENSTRUAL_PERIOD,
           name: '经期',
           InnerValue: data.value2,
-          titleCptId: data.titleCptId
+          titleCptId: data.titleCptId,
         },
         {
           cptId: myCptId.MENSTRUATION_FIGURE + myCptId.AGE_OF_MENOPAUSE,
           name: '绝经年龄',
           InnerValue: data.value3,
-          titleCptId: data.titleCptId
+          titleCptId: data.titleCptId,
         },
         {
           cptId: myCptId.MENSTRUATION_FIGURE + myCptId.PERIOD,
           name: '周期',
           InnerValue: data.value4,
-          titleCptId: data.titleCptId
-        }
+          titleCptId: data.titleCptId,
+        },
       ]
       break
     case 'FourValues2': //月经公式3
@@ -99,26 +99,26 @@ export function getFormulaElementListWithAttr(data) {
           cptId: myCptId.MENSTRUATION_FIGURE + myCptId.AGE_OF_MENARCHE,
           name: '初潮年龄',
           InnerValue: data.value1,
-          titleCptId: data.titleCptId
+          titleCptId: data.titleCptId,
         },
         {
           cptId: myCptId.MENSTRUATION_FIGURE + myCptId.MENSTRUAL_PERIOD,
           name: '经期',
           InnerValue: data.value2,
-          titleCptId: data.titleCptId
+          titleCptId: data.titleCptId,
         },
         {
           cptId: myCptId.MENSTRUATION_FIGURE + myCptId.AGE_OF_MENOPAUSE,
           name: '绝经年龄',
           InnerValue: data.value3,
-          titleCptId: data.titleCptId
+          titleCptId: data.titleCptId,
         },
         {
           cptId: myCptId.MENSTRUATION_FIGURE + myCptId.PERIOD,
           name: '周期',
           InnerValue: data.value4,
-          titleCptId: data.titleCptId
-        }
+          titleCptId: data.titleCptId,
+        },
       ]
       break
     case 'ThreeValues': //月经公式4
@@ -127,20 +127,20 @@ export function getFormulaElementListWithAttr(data) {
           cptId: myCptId.MENSTRUATION_FIGURE + myCptId.AGE_OF_MENARCHE,
           name: '初潮年龄',
           InnerValue: data.value1,
-          titleCptId: data.titleCptId
+          titleCptId: data.titleCptId,
         },
         {
           cptId: myCptId.MENSTRUATION_FIGURE + myCptId.MENSTRUAL_PERIOD,
           name: '经期',
           InnerValue: data.value2,
-          titleCptId: data.titleCptId
+          titleCptId: data.titleCptId,
         },
         {
           cptId: myCptId.MENSTRUATION_FIGURE + myCptId.PERIOD,
           name: '周期',
           InnerValue: data.value3,
-          titleCptId: data.titleCptId
-        }
+          titleCptId: data.titleCptId,
+        },
       ]
       break
     case 'Pupil': //瞳孔图

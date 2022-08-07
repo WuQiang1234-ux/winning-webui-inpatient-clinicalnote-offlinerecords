@@ -5,7 +5,10 @@ let mixin = {
       currentActiveLoadedClinicalnote: this.currentActiveLoadedClinicalnote,
       loadedClinicalnoteList: this.loadedClinicalnoteList,
       addToLoadedClinicalnoteList: this.addToLoadedClinicalnoteList,
-      setCurrentActiveClinicalnoteById: this.setCurrentActiveClinicalnoteById
+      setCurrentActiveClinicalnoteById: this.setCurrentActiveClinicalnoteById,
+      loadedClinicalnoteIdList: this.loadedClinicalnoteIdList,
+      deleteInLoadedClinicalnoteListById: this.deleteInLoadedClinicalnoteListById,
+      clearLoadedClinicalnoteList: this.clearLoadedClinicalnoteList
     }
   }
   ,
@@ -17,9 +20,23 @@ let mixin = {
     }
   },
   created() {
+    console.log('实例花了？')
+  },
+  computed: {
+    loadedClinicalnoteIdList() {
+      let loadedClinicalnoteList = this.loadedClinicalnoteList
+      if (!loadedClinicalnoteList && !loadedClinicalnoteList.length) {
+        return []
+      }
+      return loadedClinicalnoteList.map(item => {
+        return item.id
+      })
+    },
+
   },
   mounted() {
     this.areaEncounterId = this.$router.currentRoute.params.id //只会执行一次
+
   },
   methods: {
     addToLoadedClinicalnoteList(payload) {
@@ -60,6 +77,17 @@ let mixin = {
           this.$set(this.currentActiveLoadedClinicalnote, key, currentActiveLoadedClinicalnote[key])
         }
       }
+    },
+    deleteInLoadedClinicalnoteListById(payload) {
+      this.loadedClinicalnoteList.forEach((item, i) => {
+        if (item.id == payload) {
+          this.loadedClinicalnoteList.splice(i, 1)
+        }
+      })
+    },
+    clearLoadedClinicalnoteList() {
+      this.loadedClinicalnoteList.length = 0
+      this.currentActiveLoadedClinicalnote = {}
     },
   },
 }

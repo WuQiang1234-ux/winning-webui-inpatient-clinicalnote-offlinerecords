@@ -8,7 +8,7 @@
         <div class="container-letft-patient-list">
           <patient-list @patientChange="patientChange"></patient-list>
         </div>
-        <div class="container-patient-content" v-loding="patientLoding">
+        <div class="container-patient-content">
           <keep-alive>
             <router-view :key="$route.fullPath" />
           </keep-alive>
@@ -25,9 +25,7 @@ export default {
   name: 'patientOverview',
   components: { HeaderPatientsDetails, PatientList },
   data() {
-    return {
-      patientLoding: false,
-    }
+    return {}
   },
   methods: {
     patientChange(newPatient) {
@@ -40,20 +38,21 @@ export default {
         if (item.meta?.encounterId == encounterId) {
           oldPathFlag = true
         }
-        if (item.meta?.encounterId == encounterId) {
+        if (this.$route.meta?.encounterId == encounterId) {
           skip = false
         }
       })
-      if (!skip) return
+      if (!skip) {
+        return
+      }
       if (oldPathFlag) {
         this.$router.push(newPath)
         return
       }
 
       const routeObj = {
-        path: '/patientOverview/:encounterId',
+        path: newPath,
         name: '',
-        params: { encounterId },
         meta: { encounterId },
         component: () => import('../InpatientClinicalnoteMainPage/index.vue'),
       }

@@ -1,5 +1,5 @@
 <template>
-  <div v-loading="clinicalnoteProcessing" class="multi-clinicalnote-board-wrap">
+  <div class="multi-clinicalnote-board-wrap">
     <div class="multi-clinicalnote-board-content">
       <!--编辑器只需要 普通病历、连续病程、只读的、会诊记录   其他的通过参数区分即可   -->
       <el-tabs
@@ -34,37 +34,6 @@
           <template v-else-if="item.type === clinicalnoteTypes.READ_ONLY">
             <readonlyEditor :id="item.id" :clinicalnoteData="item.options"></readonlyEditor>
           </template>
-          <template v-if="item.type === clinicalnoteTypes.ARCHIVE_REVIEW">
-            <archive-review-editor
-              :id="item.id"
-              :clinicalnoteData="item.options"
-              :isArchiveReview="true"
-            ></archive-review-editor>
-          </template>
-          <template v-if="item.type === clinicalnoteTypes.PERSONAL_TEMPLATE">
-            <personal-template :id="item.id" :clinicalnoteData="item.options"></personal-template>
-          </template>
-          <template v-if="item.type === clinicalnoteTypes.REVISE_CLINICALNOTE">
-            <clinicalnote-revise :id="item.id" :clinicalnoteData="item.options"></clinicalnote-revise>
-          </template>
-          <template v-if="item.type === clinicalnoteTypes.MEDTECH_REPORT_IPT">
-            <medtech-report-ipt-container :id="item.id" :clinicalnoteData="item.options"></medtech-report-ipt-container>
-          </template>
-          <template v-if="item.type === clinicalnoteTypes.INPCLI_SIGN_OFFORDER">
-            <inp-cli-sign-off-order :id="item.id" :clinicalnoteData="item.options"></inp-cli-sign-off-order>
-          </template>
-          <template v-if="item.type === clinicalnoteTypes.HISTORY_APPLY_FORM">
-            <history-apply-form :id="item.id" :clinicalnoteData="item.options"></history-apply-form>
-          </template>
-          <template v-if="item.type === clinicalnoteTypes.DOCTOR_READING_LIST">
-            <doctor-reading-list :id="item.id" :clinicalnoteData="item.options"></doctor-reading-list>
-          </template>
-          <template v-if="item.type === clinicalnoteTypes.NURSE_VIEW">
-            <nurse-view :id="item.id" :clinicalnoteData="item.options"></nurse-view>
-          </template>
-          <template v-if="item.type === clinicalnoteTypes.OUTPATIENT_EDITOR">
-            <outpatient-editor :id="item.id" :clinicalnoteData="item.options" />
-          </template>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -80,21 +49,6 @@ import InpatientClinicalnoteEditor from '../InpatientClinicalnoteEditor/index.vu
 // import MedicalRecordContainer from '../MedicalRecordContainer'
 import ConsultationEditor from '../InpatientClinicalnoteEditor/consultationEditor'
 import readonlyEditor from '../InpatientClinicalnoteEditor/readonlyEditor'
-import ArchiveReviewEditor from '../InpatientClinicalnoteEditor/ArchiveReviewEditor'
-import PersonalTemplate from '../InpatientClinicalnoteEditor/personalTemplate.vue'
-import ClinicalnoteRevise from '../InpatientClinicalnoteEditor/ClinicalnoteRevise.vue'
-import MedtechReportIptContainer from '../InpatientClinicalnoteEditor/MedtechReportIptContainer.vue'
-import InpCliSignOffOrder from '../InpatientClinicalnoteEditor/InpCliSignOffOrder.vue'
-import HistoryApplyForm from '../InpatientClinicalnoteEditor/HistoryApplyForm.vue'
-import DoctorReadingList from '../InpatientClinicalnoteEditor/DoctorReadingList.vue'
-import nurseView from '../InpatientClinicalnoteEditor/nurseView.vue'
-import OutpatientEditor from '../InpatientClinicalnoteEditor/OutPaitentEditor.vue'
-import { createNamespacedHelpers } from 'vuex'
-const {
-  mapState: componentsMapStates,
-  mapGetters: componentsMapGetters,
-  mapMutations: componentsMapMutations,
-} = createNamespacedHelpers('components/multiClinicalnoteBoardState')
 
 import { createEventKeyWithNamespace } from '@/utils/event_hub_helper.js'
 import { ClinicalnoteEditorEventKeys } from '@/components/InpatientClinicalnoteEditor'
@@ -114,7 +68,6 @@ export const ClinicalnoteTypes = {
   NURSE_VIEW: 'NURSE_VIEW',
   OUTPATIENT_EDITOR: 'OUTPATIENT_EDITOR',
 }
-import getEventHubHelper from '@/utils/event_hub_helper.js'
 const createEventKey = createEventKeyWithNamespace(
   'MULTI_CLINICALNOTE_BOARD_EVENT'
 )
@@ -131,16 +84,17 @@ export default {
     // MedicalRecordContainer,
     ConsultationEditor,
     readonlyEditor,
-    ArchiveReviewEditor,
-    PersonalTemplate,
-    ClinicalnoteRevise,
-    MedtechReportIptContainer,
-    InpCliSignOffOrder,
-    DoctorReadingList,
-    nurseView,
-    OutpatientEditor,
-    HistoryApplyForm,
   },
+  inject: [
+    'currentActiveLoadedClinicalnote',
+    'loadedClinicalnoteList',
+    'addToLoadedClinicalnoteList',
+    'setCurrentActiveClinicalnoteById',
+    'loadedClinicalnoteIdList',
+    'setCurrentActiveClinicalnoteById',
+    'deleteInLoadedClinicalnoteListById',
+    'clearLoadedClinicalnoteList',
+  ],
   data() {
     return {
       entrancePermisstionIds: [
@@ -152,50 +106,24 @@ export default {
     }
   },
   computed: {
-    ...componentsMapStates([
-      'clinicalnoteProcessing',
-      'loadedClinicalnoteList',
-      'currentActiveLoadedClinicalnote',
-    ]),
-    ...componentsMapGetters([
-      'loadedClinicalnoteIdList',
-      'currentActiveLoadedClinicalnoteId',
-    ]),
     clinicalnoteTypes() {
       return ClinicalnoteTypes
     },
     currentId: {
       get() {
-        return this.currentActiveLoadedClinicalnoteId
+        return this.currentActiveLoadedClinicalnote?.id ?? ''
       },
       set() {},
     },
   },
-  created() {
-    this.eventHubHelper = getEventHubHelper(this.$root.eventHub)
-  },
-  mounted() {
-    this.$root.eventHub.$on(
-      ClinicalnoteEditorEventKeys.HANDLE_CLOSE_CLINICALNOTE,
-      this.handleTabRemove
-    )
-  },
-  beforeDestroy() {
-    this.$root.eventHub.$off(
-      ClinicalnoteEditorEventKeys.HANDLE_CLOSE_CLINICALNOTE,
-      this.handleTabRemove
-    )
-  },
+  created() {},
+  mounted() {},
+  beforeDestroy() {},
   methods: {
-    ...componentsMapMutations([
-      'setCurrentActiveClinicalnoteById',
-      'deleteInLoadedClinicalnoteListById',
-      'clearLoadedClinicalnoteList',
-    ]),
     async handleDoDelete(id) {
-      let _target = this.loadedClinicalnoteList.find((v) => {
-        return v.id == id
-      })
+      // let _target = this.loadedClinicalnoteList.find((v) => {
+      //   return v.id == id
+      // })
 
       let _index = this.loadedClinicalnoteIdList.indexOf(id)
       this.deleteInLoadedClinicalnoteListById(id)
@@ -215,13 +143,6 @@ export default {
         this.clearLoadedClinicalnoteList()
       }
 
-      if (_target) {
-        let inpatEmrSetId = this.getEmrSetId(_target)
-        // 通知后端关闭了该病历
-        // if (!inpatEmrSetId.includes('readonly')) {
-        //   await api.apiColseCasHistory({ inpatEmrSetId })
-        // }
-      }
       window.eventBus.$emit(
         'qualityCntrolActivateMedicalHistoryData',
         this.currentActiveLoadedClinicalnote
@@ -233,6 +154,8 @@ export default {
       //2.激活的是住院病历首页直接关闭
       //3.激活的会诊记录直接关闭
       let { type } = this.currentActiveLoadedClinicalnote
+      // console.log(this.currentId, id)
+      // debugger
       let flag =
         this.currentId !== id ||
         type == 'MEDICAL_RECORD' ||
@@ -248,13 +171,13 @@ export default {
       if (action === 'delete' || flag) {
         this.handleDoDelete(id)
       } else {
-        this.$root.eventHub.$emit(
-          ClinicalnoteEditorEventKeys.MEDICAL_RECORDS_BEFORE_DELETION,
-          id,
-          () => {
-            this.handleDoDelete(id)
-          }
-        )
+        // this.$root.eventHub.$emit(
+        //   ClinicalnoteEditorEventKeys.MEDICAL_RECORDS_BEFORE_DELETION,
+        //   id,
+        //   () => {
+        //     this.handleDoDelete(id)
+        //   }
+        // )
       }
     },
     handleTabClick(tab) {
