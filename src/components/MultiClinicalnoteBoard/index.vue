@@ -11,7 +11,7 @@
         @tab-click="handleTabClick"
       >
         <el-tab-pane
-          v-for="item in loadedClinicalnoteList"
+          v-for="item in patientRootComponent.loadedClinicalnoteList"
           :key="item.id"
           :label="item.title"
           :name="item.id"
@@ -85,16 +85,7 @@ export default {
     ConsultationEditor,
     readonlyEditor,
   },
-  inject: [
-    'currentActiveLoadedClinicalnote',
-    'loadedClinicalnoteList',
-    'addToLoadedClinicalnoteList',
-    'setCurrentActiveClinicalnoteById',
-    'loadedClinicalnoteIdList',
-    'setCurrentActiveClinicalnoteById',
-    'deleteInLoadedClinicalnoteListById',
-    'clearLoadedClinicalnoteList',
-  ],
+  inject: ['patientRootComponent'],
   data() {
     return {
       entrancePermisstionIds: [
@@ -111,7 +102,9 @@ export default {
     },
     currentId: {
       get() {
-        return this.currentActiveLoadedClinicalnote?.id ?? ''
+        return (
+          this.patientRootComponent.currentActiveLoadedClinicalnote?.id ?? ''
+        )
       },
       set() {},
     },
@@ -125,27 +118,28 @@ export default {
       //   return v.id == id
       // })
 
-      let _index = this.loadedClinicalnoteIdList.indexOf(id)
-      this.deleteInLoadedClinicalnoteListById(id)
-      if (this.currentActiveLoadedClinicalnote.id == id) {
+      let _index =
+        this.patientRootComponent.loadedClinicalnoteIdList.indexOf(id)
+      this.patientRootComponent.deleteInLoadedClinicalnoteListById(id)
+      if (this.patientRootComponent.currentActiveLoadedClinicalnote.id == id) {
         if (_index - 1 >= 0) {
-          this.setCurrentActiveClinicalnoteById(
-            this.loadedClinicalnoteIdList[_index - 1]
+          this.patientRootComponent.setCurrentActiveClinicalnoteById(
+            this.patientRootComponent.loadedClinicalnoteIdList[_index - 1]
           )
         } else {
-          this.setCurrentActiveClinicalnoteById(
-            this.loadedClinicalnoteIdList[0]
+          this.patientRootComponent.setCurrentActiveClinicalnoteById(
+            this.patientRootComponent.loadedClinicalnoteIdList[0]
           )
         }
       }
 
-      if (this.loadedClinicalnoteIdList.length == 0) {
-        this.clearLoadedClinicalnoteList()
+      if (this.patientRootComponent.loadedClinicalnoteIdList.length == 0) {
+        this.patientRootComponent.clearLoadedClinicalnoteList()
       }
 
       window.eventBus.$emit(
         'qualityCntrolActivateMedicalHistoryData',
-        this.currentActiveLoadedClinicalnote
+        this.patientRootComponent.currentActiveLoadedClinicalnote
       )
     },
     async handleTabRemove(id, action) {
@@ -153,7 +147,7 @@ export default {
       //1.当前窗口没有被激活的话直接关闭,
       //2.激活的是住院病历首页直接关闭
       //3.激活的会诊记录直接关闭
-      let { type } = this.currentActiveLoadedClinicalnote
+      let { type } = this.patientRootComponent.currentActiveLoadedClinicalnote
       // console.log(this.currentId, id)
       // debugger
       let flag =
@@ -181,10 +175,14 @@ export default {
       }
     },
     handleTabClick(tab) {
-      if (tab.name == this.currentActiveLoadedClinicalnoteId) return
-      this.setCurrentActiveClinicalnoteById(tab.name)
+      if (
+        tab.name == this.patientRootComponent.currentActiveLoadedClinicalnoteId
+      )
+        return
+      this.patientRootComponent.setCurrentActiveClinicalnoteById(tab.name)
       if (this.currentActiveLoadedClinicalnoteId.includes('readonly')) return
-      let currentClinicalnote = this.loadedClinicalnoteList[tab.index]
+      let currentClinicalnote =
+        this.patientRootComponent.loadedClinicalnoteList[tab.index]
       let id = this.getEmrSetId(currentClinicalnote)
       this.eventHubHelper.emit(MultiClinicalnoteBoardEventKeys.TAB_CLICK, {
         id,

@@ -1,6 +1,6 @@
 <template>
   <div class="inpatient-emr-edit-area-wrap">
-    <MultiClinicalnoteBoard v-show="loadedClinicalnoteList.length" />
+    <MultiClinicalnoteBoard v-show="patientRootComponent.loadedClinicalnoteList.length" />
   </div>
 </template>
 
@@ -8,7 +8,7 @@
 import MultiClinicalnoteBoard from '@/components/MultiClinicalnoteBoard'
 export default {
   name: '',
-  inject: ['loadedClinicalnoteList'],
+  inject: ['patientRootComponent'],
   components: { MultiClinicalnoteBoard },
   props: {},
   data() {

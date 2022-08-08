@@ -33,16 +33,16 @@ export default {
   props: {
     visible: {
       type: Boolean,
-      default: false
+      default: false,
     },
     emrSetTitle: {
       type: String,
-      default: '病历'
+      default: '病历',
     },
     emrSetId: {
       type: [String, Number],
-      default: ''
-    }
+      default: '',
+    },
   },
   data() {
     return {}
@@ -50,7 +50,7 @@ export default {
   computed: {
     ...componentsMapStates([
       // 'currentActiveLoadedClinicalnote',
-      'pgEditorCurrentInputInfo'
+      'pgEditorCurrentInputInfo',
     ]),
     documentUpdatePromptDialogVisible: {
       get() {
@@ -58,8 +58,8 @@ export default {
       },
       set(val) {
         this.$emit('update:visible', val)
-      }
-    }
+      },
+    },
     // emrSetId() {
     //   return this.currentActiveLoadedClinicalnote.options.content.emrSetId
     // }
@@ -72,7 +72,7 @@ export default {
       this.documentUpdatePromptDialogVisible = false
     },
     open() {
-      console.log(this.currentActiveLoadedClinicalnote)
+      // console.log(this.currentActiveLoadedClinicalnote)
     },
     getNewDoc() {
       if (this.$parent.clinicalnoteData.serial) {
@@ -80,7 +80,7 @@ export default {
         //删除
         this.$parent.pgEditor.pgEditorInstance.postmessage({
           type: 'CloseDocByDocId',
-          param: [emrSetId]
+          param: [emrSetId],
         })
         this.$parent.clinicalnoteData.content.list.forEach((el, i) => {
           if (el.id == emrSetId) {
@@ -94,20 +94,18 @@ export default {
       this.documentUpdatePromptDialogVisible = false
     },
     async coverNewDoc() {
-      let {
-        inpatEmrRecordId,
-        emrSetId
-      } = await this.$parent.getNormalClinicalnoteContent(this.emrSetId)
+      let { inpatEmrRecordId, emrSetId } =
+        await this.$parent.getNormalClinicalnoteContent(this.emrSetId)
       this.$parent.upDateVersion({
         data: {
           inpatEmrRecordId,
-          inpatEmrSetId: emrSetId
-        }
+          inpatEmrSetId: emrSetId,
+        },
       })
       console.log('直接覆蓋', inpatEmrRecordId)
       this.documentUpdatePromptDialogVisible = false
-    }
-  }
+    },
+  },
 }
 </script>
 

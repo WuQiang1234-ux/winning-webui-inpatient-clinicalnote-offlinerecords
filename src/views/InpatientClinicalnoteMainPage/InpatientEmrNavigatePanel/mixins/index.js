@@ -2,29 +2,30 @@ import { ClinicalnoteTypes } from '@/components/MultiClinicalnoteBoard'
 import getEventHubHelper from '@/utils/event_hub_helper.js'
 let mixin = {
   components: {},
-  inject: ['currentActiveLoadedClinicalnote', 'loadedClinicalnoteList', 'addToLoadedClinicalnoteList', 'setCurrentActiveClinicalnoteById'],
+  inject: ['patientRootComponent'],
   props: {
     publicParameters: {
-      type: Object
-    }
+      type: Object,
+    },
   },
   data() {
-    return {
-    }
+    return {}
   },
   computed: {
     currentEmrSetId() {
-      return this.currentActiveLoadedClinicalnote?.options?.content?.emrSetId
-    }
+      return this.patientRootComponent.currentActiveLoadedClinicalnote?.options
+        ?.content?.emrSetId
+    },
   },
   watch: {
-    'currentActiveLoadedClinicalnote.id'(v) {
+    'patientRootComponent.currentActiveLoadedClinicalnote.id'(v) {
       if (v) {
-        console.log('改了')
+        console.log('改了', this.patientRootComponent)
         // if (this.activateMenu == 'emr_tree') {
         this.treeDefaultExpandedKeys = []
         this.treeDefaultExpandedKeys?.push(
-          this.currentActiveLoadedClinicalnote.options.content.emrTypeId
+          this.patientRootComponent.currentActiveLoadedClinicalnote.options
+            .content.emrTypeId
         )
         // }
       }
@@ -32,8 +33,6 @@ let mixin = {
   },
   created() {
     this.eventHubHelper = getEventHubHelper(this.$root.eventHub)
-
-
   },
   beforeDestroy() {
     this.eventHubHelper.destroy()
@@ -52,7 +51,7 @@ let mixin = {
       const { id, label, emrClass } = data
       const hasFlag = this.hasInLoadedClinicalnoteList(id)
       if (!hasFlag) {
-        this.addToLoadedClinicalnoteList({
+        this.patientRootComponent.addToLoadedClinicalnoteList({
           id,
           type,
           title: label,
@@ -75,13 +74,13 @@ let mixin = {
               mrtEditorTypeCode: '',
               emrStatusCode: '', //病历当前状态 用于控制病历状态图标
               inpatEmrSetStatusCode: '',
-              paragraphIds: [] //短语引用需要根据段落筛选分类
-            }
-          }
+              paragraphIds: [], //短语引用需要根据段落筛选分类
+            },
+          },
         })
       }
 
-      this.setCurrentActiveClinicalnoteById(id)
+      this.patientRootComponent.setCurrentActiveClinicalnoteById(id)
     },
     //连续病历处理
     async openEmrSetSerial(data) {
@@ -94,7 +93,7 @@ let mixin = {
       let _uniqueId = this.currentPatientInfo.encounterId + emrTypeId
       const hasFlag = this.hasInLoadedClinicalnoteList(_uniqueId)
       if (!hasFlag) {
-        this.addToLoadedClinicalnoteList({
+        this.patientRootComponent.addToLoadedClinicalnoteList({
           id: _uniqueId,
           title: emrTypeName,
           loading: true,
@@ -117,12 +116,12 @@ let mixin = {
               blankXml: '',
               list: [],
 
-              paragraphIds: [] //短语引用需要根据段落筛选分类
-            }
-          }
+              paragraphIds: [], //短语引用需要根据段落筛选分类
+            },
+          },
         })
       }
-      this.setCurrentActiveClinicalnoteById(_uniqueId)
+      this.patientRootComponent.setCurrentActiveClinicalnoteById(_uniqueId)
       //连续病历更新成当前查看病历的id todo 需要处理
       this.setCurrentEmrSetSerialId(id)
       // 更换成编辑图标
@@ -133,14 +132,13 @@ let mixin = {
       data1.loading = true
     },
 
-    async deleteClinicalnote() {
-    },
+    async deleteClinicalnote() {},
     hasInLoadedClinicalnoteList(id) {
-      return this.loadedClinicalnoteList.find(v => {
+      return this.patientRootComponent.loadedClinicalnoteList.find((v) => {
         return v.id == id
       })
     },
-  }
+  },
 }
 
 export default mixin
