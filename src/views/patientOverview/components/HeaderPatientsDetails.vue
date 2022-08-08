@@ -8,16 +8,20 @@
         <div class="header_title">科室：</div>骨科
       </div>
       <div class="item">
-        <div class="header_title">encounterId：</div>111111
+        <div class="header_title">encounterId：</div>
+        {{currentActiveLoadedPatient.encounterId}}
       </div>
       <div class="item">
-        <div class="header_title">姓名：</div>测试
+        <div class="header_title">姓名：</div>
+        测试{{currentActiveLoadedPatient.name}}
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { createNamespacedHelpers } from 'vuex'
+const { mapState: patientInfoMapState } = createNamespacedHelpers('patientInfo')
 export default {
   name: '',
   components: {},
@@ -25,7 +29,7 @@ export default {
   data() {
     return {}
   },
-  computed: {},
+  computed: { ...patientInfoMapState(['currentActiveLoadedPatient']) },
   watch: {},
   created() {},
   mounted() {},

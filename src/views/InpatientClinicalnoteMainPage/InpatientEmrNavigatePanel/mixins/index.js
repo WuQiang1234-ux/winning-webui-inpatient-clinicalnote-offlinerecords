@@ -16,6 +16,9 @@ let mixin = {
       return this.patientRootComponent.currentActiveLoadedClinicalnote?.options
         ?.content?.emrSetId
     },
+    currentPatientInfo() {
+      return this.patientRootComponent.currentPatientInfo
+    },
   },
   watch: {
     'patientRootComponent.currentActiveLoadedClinicalnote.id'(v) {
@@ -123,9 +126,9 @@ let mixin = {
       }
       this.patientRootComponent.setCurrentActiveClinicalnoteById(_uniqueId)
       //连续病历更新成当前查看病历的id todo 需要处理
-      this.setCurrentEmrSetSerialId(id)
+      this.patientRootComponent.setCurrentEmrSetSerialId(id)
       // 更换成编辑图标
-      this.NewAndChangedIcon()
+      // this.NewAndChangedIcon()
     },
 
     async handleDeleteClinicalnote(data1) {

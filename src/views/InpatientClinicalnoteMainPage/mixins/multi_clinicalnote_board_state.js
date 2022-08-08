@@ -9,7 +9,7 @@ let mixin = {
     return {
       currentActiveLoadedClinicalnote: {},
       loadedClinicalnoteList: [],
-      areaEncounterId: null, //当前区域的患者id
+      currentPatientInfo: null, //当前区域的患者信息
     }
   },
   computed: {
@@ -24,7 +24,10 @@ let mixin = {
     },
   },
   mounted() {
-    this.areaEncounterId = this.$router.currentRoute.params.id //只会执行一次
+    this.currentPatientInfo = {
+      bizRoleId: '',
+      encounterId: this.$router.currentRoute.meta.encounterId,
+    }
   },
   methods: {
     addToLoadedClinicalnoteList(payload) {
@@ -73,6 +76,10 @@ let mixin = {
     clearLoadedClinicalnoteList() {
       this.loadedClinicalnoteList.length = 0
       this.currentActiveLoadedClinicalnote = {}
+    },
+    setCurrentEmrSetSerialId(payload) {
+      //连续病历更新成当前查看病历的id
+      this.currentActiveLoadedClinicalnote.options.content.emrSetId = payload
     },
   },
 }

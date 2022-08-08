@@ -18,7 +18,7 @@ import { EditorEvent } from '@/libs/PgEditor/constants'
 import { cb2promise } from '@/utils/convertFunction'
 import { decompress } from './utils'
 import PgEditor from '@/libs/PgEditor'
-import { data1 } from './textData'
+import { data1, data2 } from './textData'
 export default {
   name: '',
   components: { PgEditor },
@@ -55,9 +55,9 @@ export default {
       },
     },
   },
+  inject: ['patientRootComponent'],
   data() {
     return {
-      currentPatientInfo: {},
       userInfo: {},
       orgInfo: {},
       toolbarOptions: {
@@ -75,6 +75,9 @@ export default {
     }
   },
   computed: {
+    currentPatientInfo() {
+      return this.patientRootComponent.currentPatientInfo
+    },
     currentDocId() {
       return this.clinicalnoteData.content.emrSetId.replace('readonly', '')
     },
@@ -237,6 +240,44 @@ export default {
         list.unshift(list.splice(firstIndex, 1)[0])
       }
     },
+    //加载所有连续病程
+    async loadSerialClinicalnoteXmlAsync(list) {
+      const pgEditor = this.getEditor()
+      const appendSubDocs = () => {
+        let options = []
+        for (let index = 0; index < list.length; index++) {
+          let item = list[index]
+          if (item.xml) {
+            const option = {
+              docId: item.id,
+              srcstr: item.xml,
+              newPage: item.newPage,
+              isEditable: item.permission?.editable,
+            }
+            options.push(option)
+          }
+        }
+        console.log('连续病历子文档插入---------', options, options.length)
+        pgEditor.pgEditorInstance.postmessage({
+          type: 'OpenAndAppendDoc',
+          param: options,
+        })
+      }
+
+      const load = (cb = () => {}) => {
+        pgEditor.eventEmitter.$once(EditorEvent.PG_EVENT_XML_ONLOAD, () => {
+          cb()
+        })
+        appendSubDocs()
+      }
+
+      if (!pgEditor?.pgEditorLoaded) {
+        await pgEditor.waitEditorLoaded()
+      }
+      await cb2promise((cb) => {
+        load(cb)
+      })
+    },
     /*插入一份病程*/
     async insertSubDocsAction(subDoc) {
       if (!subDoc?.xml) return
@@ -265,6 +306,161 @@ export default {
       await appendSubDocs()
       console.log(subDoc.inpatEmrSetFileTime, subDoc.emrSetTitle, '加载完了')
       return index
+    },
+    /*
+     * 获取连续病程内容
+     * inpatientEmrSetId   当前点击的连续病程id
+     * inpEmrSetIds        inpEmrSetIds为空则获取所有病程内容   不为空则获取指定病程内容
+     */
+    async getClinicalnoteContentListByIds(
+      inpatientEmrSetId,
+      inpEmrSetIds = []
+    ) {
+      if (this.loadedSubDocList.length && !inpEmrSetIds.length) {
+        inpEmrSetIds = [inpatientEmrSetId]
+      }
+      let res = data2
+      const {
+        data: { inpatientEMRVOList, topContent },
+      } = res
+
+      let contentList = []
+      // const PrintModes = {
+      //   CONTINUOUS_PRINT: '399542537', // 续打
+      //   ALONE_PRINT: '399542538', // 单页打
+      //   CONTINUOUS_NEW_PAGE_PRINT: '399542540', // 续打（新页打）
+      //   CONTINUOUS_SINGLE_PAGE_PRINT: '399542541', // 续打（单独打）
+      // }
+      if (inpatientEMRVOList?.length) {
+        for (let index = 0; index < inpatientEMRVOList.length; index++) {
+          let item = inpatientEMRVOList[index]
+          // let printConfig = item.printOutputVO
+          // let printMode = printConfig ? printConfig.printMode : ''
+          // let isNewPage = false
+          // let nextNewPage = false
+
+          // switch (printMode) {
+          //   case PrintModes.CONTINUOUS_PRINT: //续打
+          //     isNewPage = false
+          //     nextNewPage = false
+          //     break
+          //   case PrintModes.ALONE_PRINT: //单页打  --一般病程不设置单页打
+          //     isNewPage = false
+          //     nextNewPage = false
+          //     break
+          //   case PrintModes.CONTINUOUS_NEW_PAGE_PRINT: //续打（新页打）
+          //     isNewPage = true
+          //     nextNewPage = false
+          //     break
+          //   case PrintModes.CONTINUOUS_SINGLE_PAGE_PRINT: //续打（单独打）
+          //     isNewPage = true
+          //     nextNewPage = true
+          //     break
+          //   default:
+          //     isNewPage = false
+          //     nextNewPage = false
+          // }
+
+          let xml = ''
+
+          if (item?.inpatientEMRContentVO?.inpatEmrContentData) {
+            xml = decompress(item.inpatientEMRContentVO.inpatEmrContentData)
+          }
+          let contentObj = {
+            id: item.inpatEmrSetId,
+            emrSetId: item.inpatEmrSetId,
+            emrSetTitle: item.inpatEmrSetTitle,
+            inpatientMrtId: item.inpatientMrtId,
+            inpMrtMonitorId: item.inpMrtMonitorId,
+            xml,
+            createdAt: item.createdAt,
+            inpatEmrSetFileTime: item.inpatEmrSetFileTime,
+            hasContent: item.inpatEmrSetStatusCode !== '960074',
+            modifiedAt: item.modifiedAt ?? 0, //病历上次修改时间
+            inpatEmrRecordId: item.inpatEmrRecordId,
+            isFirstCourse: item.isFirstCourse,
+            emrStatusCode:
+              item.inpEmrDisplayStatusCode || item.inpatEmrSetStatusCode, //病历当前状态 用于控制病历状态图标
+            inpatEmrSetStatusCode: item.inpatEmrSetStatusCode,
+            // printConfig,
+            permission: {
+              editable:
+                item.sealedStatus != '399572897' && //病案-已封存
+                item.casePrintStatus != '399572894', //病案-已打印,
+              permissionVOList: [],
+            },
+            // newPage:
+            //   contentList[index - 1]?.nextNewPage ||
+            //   isNewPage ||
+            //   //封存
+            //   (contentList[index - 1]?.emrStatusCode == '399572897' &&
+            //   item.inpEmrDisplayStatusCode !== '399572897' && //连续的两个封存病历不另外新起一页
+            //     this.isNewPageAfterSafeKeeping),
+            // nextNewPage,
+            mrtEditorTypeCode: item?.inpatientEMRContentVO?.mrtEditorTypeCode,
+            sealedStatus: item.sealedStatus, //399572897 表示病历封存
+            casePrintStatus: item.casePrintStatus, //399572894 表示病历已打印
+            caseSpecialPermissionStatus: item.caseSpecialPermissionStatus, //399576453 已打印特批状态
+          }
+
+          //xml为空会导致病程打不开  需过滤掉
+          if (contentObj.xml) {
+            contentList.push(contentObj)
+          }
+        }
+      }
+
+      console.log(123444)
+      // const printArrs = await this.getPrintConfigInfo(contentList)
+      // contentList.forEach((item, index) => {
+      //   printArrs.map((print) => {
+      //     if (item.inpMrtMonitorId == print.inpMrtMonitorId) {
+      //       item.printConfig = print
+      //       let printMode = item.printConfig ? item.printConfig.printMode : ''
+      //       let isNewPage = false
+      //       let nextNewPage = false
+
+      //       switch (printMode) {
+      //         case PrintModes.CONTINUOUS_PRINT: //续打
+      //           isNewPage = false
+      //           nextNewPage = false
+      //           break
+      //         case PrintModes.ALONE_PRINT: //单页打  --一般病程不设置单页打
+      //           isNewPage = false
+      //           nextNewPage = false
+      //           break
+      //         case PrintModes.CONTINUOUS_NEW_PAGE_PRINT: //续打（新页打）
+      //           isNewPage = true
+      //           nextNewPage = false
+      //           break
+      //         case PrintModes.CONTINUOUS_SINGLE_PAGE_PRINT: //续打（单独打）
+      //           isNewPage = true
+      //           nextNewPage = true
+      //           break
+      //         default:
+      //           isNewPage = false
+      //           nextNewPage = false
+      //       }
+      //       item.newPage =
+      //         contentList[index - 1]?.nextNewPage ||
+      //         isNewPage ||
+      //         //封存
+      //         (contentList[index - 1]?.emrStatusCode == '399572897' &&
+      //           item.inpEmrDisplayStatusCode !== '399572897' && //连续的两个封存病历不另外新起一页
+      //           this.isNewPageAfterSafeKeeping)
+      //       item.nextNewPage = nextNewPage
+      //     }
+      //   })
+      // })
+      let topXml = ''
+      if (topContent) {
+        topXml = decompress(topContent)
+      }
+
+      return {
+        contentList,
+        topContent: topXml,
+      }
     },
     //获取单份病历的状态及权限
     async queryClinicalnotePermissionAsync() {

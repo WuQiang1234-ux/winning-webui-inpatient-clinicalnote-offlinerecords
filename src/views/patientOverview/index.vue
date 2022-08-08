@@ -9,7 +9,7 @@
           <patient-list @patientChange="patientChange"></patient-list>
         </div>
         <div class="container-patient-content">
-          <keep-alive>
+          <keep-alive max="10">
             <router-view :key="$route.fullPath" />
           </keep-alive>
         </div>
@@ -53,7 +53,7 @@ export default {
       const routeObj = {
         path: newPath,
         name: '',
-        meta: { encounterId },
+        meta: { ...newPatient },
         component: () => import('../InpatientClinicalnoteMainPage/index.vue'),
       }
       this.$router.addRoute('patientOverview', routeObj)
