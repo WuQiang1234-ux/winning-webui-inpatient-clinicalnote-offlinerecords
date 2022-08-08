@@ -93,7 +93,7 @@ export default {
   .patient-list-add {
     position: absolute;
     bottom: 0;
-    width: 180px;
+    width: 80%;
     background: #ccc;
     height: 40px;
     display: flex;
@@ -101,7 +101,7 @@ export default {
     align-items: center;
     cursor: pointer;
     border: 1px solid #1d39c4;
-    left: 10px;
+    left: 10%;
     border-radius: 5px;
   }
 }

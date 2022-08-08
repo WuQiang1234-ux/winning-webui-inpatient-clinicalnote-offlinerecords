@@ -1,6 +1,6 @@
 <template>
   <div v-loading="loading" :class="classNames.editorWrap" class="widgets-container">
-    <!-- <EditorToolbar /> -->
+    <EditorToolbar />
     <div :id="pgEditorId" ref="pgEditor" :class="classNames.editorTarget" />
     <slot></slot>
     <!-- <allograph-dialog v-if="allographVisible" :dialogVisible.sync="allographVisible"></allograph-dialog> -->
@@ -11,7 +11,7 @@
 /* eslint-disable no-undef */
 // import api from '@/api/list'
 // import $ from 'jquery'
-// import EditorToolbar from './editor_toolbar'
+import EditorToolbar from './editor_toolbar'
 // import AllographDialog from './components/AllographDialog.vue'
 import { ClassNamespace, EditorEvent, DataElementWinIds } from './constants'
 import mixins from './mixins'
@@ -22,7 +22,7 @@ const { mapState: globalConfigMapStates, mapActions: globalConfigActions } =
   createNamespacedHelpers('globalConfig')
 export default {
   name: 'Editor',
-  components: {},
+  components: { EditorToolbar },
   mixins: [mixins.getInjectMixin()],
   props: {
     patientInfo: {

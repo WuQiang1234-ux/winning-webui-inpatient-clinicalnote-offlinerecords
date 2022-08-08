@@ -9,19 +9,91 @@
         :toolbarOptions="toolbarOptions"
       />
     </div>
+    <div :key="permisstionKey" :class="classNames.EditorOperation">
+      <editorButton
+        v-if="isShowBtnById(operationActionPermisstionIds.SNASER)"
+        :disabled="isDisableBtnById(operationActionPermisstionIds.SNASER)"
+        :operationActionPermisstionId="operationActionPermisstionIds.SNASER"
+        :emrSetId="clinicalnoteData.content.emrSetId"
+        buttonName="暂 存"
+        @buttonClick="handleSaveAction(clinicalnoteData.content.emrSetId)"
+      ></editorButton>
+    </div>
   </div>
 </template>
 
 <script>
+import { createNamespacedHelpers } from 'vuex'
+import { throttle } from '@/utils/index'
+import {
+  compress,
+  decompress,
+  formulaElementTypes,
+  getFormulaElementListWithAttr,
+} from './utils'
 const ClassNameSpace = 'inpatient-clinicalnote-editor'
-import { EditorEvent } from '@/libs/PgEditor/constants'
+import editorButton from '../../EditorButton/index'
+import {
+  txtSignatureDataArray,
+  signatureDataArray,
+} from '../../../libs/PgEditor/helper/signature_helper'
+const { mapMutations: componentsMapMutations, mapState: componentsMapStates } =
+  createNamespacedHelpers('components/multiClinicalnoteBoardState')
+import { inpMrtMonitorIdEnum } from '@/utils/enumerate'
+import {
+  EditorEvent,
+  DcEditorRenderModes,
+  DataElementWinIds,
+} from '@/libs/PgEditor/constants'
 import { cb2promise } from '@/utils/convertFunction'
-import { decompress } from './utils'
 import PgEditor from '@/libs/PgEditor'
 import { data1, data2 } from './textData'
+import { createEventKeyWithNamespace } from '@/utils/event_hub_helper.js'
+const createEventKey = createEventKeyWithNamespace(
+  'INPATIENT_CLINICALNOTE_EDITOR_EVENT'
+)
+export const ClinicalnoteEditorEventKeys = {
+  INIT: createEventKey('INIT'),
+  LOADED: createEventKey('LOADED'),
+  DOC_LOADED: createEventKey('DOC_LOADED'),
+  AUTO_CREATE: createEventKey('AUTO_CREATE'),
+  SET_SMART_INPUT_CONTENT: createEventKey('SET_SMART_INPUT_CONTENT'),
+  HANDLE_INSERT_CONTENT: createEventKey('HANDLE_INSERT_CONTENT'),
+
+  HANDLE_DELETE_CLINICALNOTE: createEventKey('HANDLE_DELETE_CLINICALNOTE'),
+  HANDLE_CLOSE_CLINICALNOTE: createEventKey('HANDLE_CLOSE_CLINICALNOTE'),
+  HANDLE_DELETE_IN_SERIAL_CLINICALNOTE: createEventKey(
+    'HANDLE_DELETE_IN_SERIAL_CLINICALNOTE'
+  ),
+  MEDICAL_RECORDS_BEFORE_DELETION: createEventKey(
+    'MEDICAL_RECORDS_BEFORE_DELETION'
+  ),
+}
+export const OperationActionPermisstionIds = {
+  SAVE: '399297354',
+  SUBMIT_AND_SIGN: '399297355', //提交
+  RECALL_SUBMIT: '399297356', //撤销提交
+
+  REVIEW_PASS: '399297357',
+  REVIEW_DISMISS: '399297358',
+  RECALL_REVIEW: '399297359',
+
+  CANCEL: '399442431', //取 消
+  RECEPTION: '399442430', //接收
+  DESIGNATE: '399442429', //指派
+  SNASER: '399297352', //暂 存
+
+  FEEDBACK: '399461483', //去反馈
+  EVALUATE: '399461484', //去评价
+  CONSULT_CONFIRM: '977584', //审核确认
+  CONSULT_SCHEDULE: '977585', //审核调度
+  CANCEL_RECEPTION: '399566791', //撤销接收
+
+  QUALITY_SNASER: '399573160', //质控暂存
+}
 export default {
   name: '',
-  components: { PgEditor },
+  components: { PgEditor, editorButton },
   props: {
     clinicalnoteData: {
       type: Object,
@@ -60,6 +132,7 @@ export default {
     return {
       userInfo: {},
       orgInfo: {},
+      preservationStatus: true,
       toolbarOptions: {
         isEmrSubmited: true,
         isShowRenderModeRadios: false,
@@ -71,6 +144,8 @@ export default {
         editable: false,
         permissionVOList: [],
       },
+      autoSaveLoading: false,
+      permisstionKey: '',
       isRelocate: true, //判断是否需要重定位（点击病历内容切换子文档时不需要重定位）
     }
   },
@@ -81,6 +156,7 @@ export default {
     currentDocId() {
       return this.clinicalnoteData.content.emrSetId.replace('readonly', '')
     },
+    ...componentsMapStates(['pgEditorCurrentInputInfo']),
     //已加载的病程
     loadedSubDocList() {
       return this.clinicalnoteData.content.list ?? []
@@ -94,12 +170,26 @@ export default {
     },
     wrapOperationPermisstionData() {
       return {
-        editable: false,
-        permissionVOList: [],
+        editable: true,
+        permissionVOList: [{ appPermissionId: ['399297352'], enabled: true }],
       }
     },
+    operationActionPermisstionIds() {
+      return OperationActionPermisstionIds
+    },
   },
-  watch: {},
+  watch: {
+    'currentActiveLoadedClinicalnote.options.content.emrSetId': {
+      handler(newVal) {
+        if (newVal) {
+          //清空存储的当前聚焦的输入域
+          this.setPgEditorCurrentInputInfo({})
+        }
+      },
+      deep: true,
+      immediate: true,
+    },
+  },
   created() {
     console.log('来了created')
     this.currentDocIdWatch = this.$watch(
@@ -112,13 +202,299 @@ export default {
     )
   },
   beforeDestroy() {
+    //辅助区域向病历编辑器插入内容
+    this.$root.eventHub.$off(
+      'AuxiliaryInfo/Insert',
+      this.handleAuxiliaryInfoInsert
+    )
+    const pgEditor = this.getEditor()
+    pgEditor.eventEmitter.$off(
+      EditorEvent.PG_EVENT_ON_CURSOR_CHANGED,
+      this.handleDocumentClick
+    )
+    this.$root.eventHub.$off(
+      ClinicalnoteEditorEventKeys.MEDICAL_RECORDS_BEFORE_DELETION,
+      this.handleTabRemove
+    )
     console.log('清掉', this.currentDocIdWatch)
     this.currentDocIdWatch()
   },
-  mounted() {},
+  mounted() {
+    //辅助区域向病历编辑器插入内容
+    console.log(this.$root.eventHub)
+    this.$root.eventHub.$on(
+      'AuxiliaryInfo/Insert',
+      this.handleAuxiliaryInfoInsert
+    )
+    const pgEditor = this.getEditor()
+    pgEditor.eventEmitter.$on(
+      EditorEvent.PG_EVENT_ON_CURSOR_CHANGED,
+      this.handleDocumentClick
+    )
+    this.$root.eventHub.$on(
+      ClinicalnoteEditorEventKeys.MEDICAL_RECORDS_BEFORE_DELETION,
+      this.handleTabRemove
+    )
+  },
   methods: {
+    ...componentsMapMutations([
+      'showClinicalnoteProcessing',
+      'setPgEditorCurrentInputInfo',
+    ]),
+    isShowBtnById(id) {
+      return !!this.wrapOperationPermisstionData.permissionVOList.find(
+        (item) => {
+          return item.appPermissionId == id
+        }
+      )
+    },
     getEditor() {
       return this.$refs.pgEditorDom
+    },
+    handleDocumentClick(e) {
+      console.log(e, '点击啊点击')
+      //切换子文档
+      // if (this.clinicalnoteData.serial) {
+      //   const subDocId = e.docInfo.docId
+      //   if (subDocId !== this.currentDocId) {
+      //     this.isRelocate = false
+      //     this.setCurrentEmrSetSerialId(subDocId)
+      //   }
+      // }
+      // if (this.mode !== DcEditorRenderModes.SET_WORK_MODE_APP) {
+      //   return
+      // }
+      //将当前聚焦的输入域信息存起来方便辅助区域插值使用
+      this.setPgEditorCurrentInputInfo({
+        CurIsImage: e.CurIsImage,
+        ...e.docInfo,
+        ...e.inputInfo,
+      })
+      // this.setPatientInformation(e)
+    },
+    //辅助区域向病历插入内容
+    async handleAuxiliaryInfoInsert($event) {
+      const pgEditor = this.getEditor()
+      // isReplace,true代表替换，false代表插入
+      let {
+        type,
+        isReplace,
+        content,
+        cptId,
+        columnArr,
+        alignParams, //表格对齐方式
+        needColspan, //表格是否要合并单元格
+        colSpanParams, // 表格合并单元格的入参
+        encounterId,
+      } = $event
+      if (encounterId !== this.currentPatientInfo.encounterId) return
+      console.log($event, '###')
+      // if (this.isShowConsultationCreator) {
+      //   return
+      // }
+      //非当前激活的病历不更新
+      if (
+        this.currentDocId !==
+        this.patientRootComponent.currentActiveLoadedClinicalnote.options
+          .content.emrSetId
+      ) {
+        console.log('非当前激活的病历不更新')
+        return
+      }
+      if (this.wrapOperationPermisstionData?.editable) {
+        if (!this.verifyElementWinIdInsertInto()) {
+          return
+        }
+
+        //cptId目前主要在既往病历插入选段落时才有
+        if (cptId) {
+          console.log('SetValue-cptId', cptId)
+          pgEditor.pgEditorInstance.postmessage({
+            type: 'SyncDataByTitle',
+            param: [
+              {
+                docId: this.currentDocId,
+                conceptId: cptId,
+                srcStr: content,
+                changeFlag: true,
+                KeepTrace: true,
+              },
+            ],
+          })
+        } else {
+          if (isReplace && this.pgEditorCurrentInputInfo.xId) {
+            //清空
+            pgEditor.pgEditorInstance.postmessage({
+              type: 'SetValue',
+              param: [
+                {
+                  conceptId: this.pgEditorCurrentInputInfo.xId,
+                  value: '',
+                  type: 'normal',
+                  idType: 'XID',
+                  valueType: 'text',
+                  changeFlag: true,
+                  paragraphFlag: true,
+                  KeepTrace: false,
+                  valueTarget: 'onlyDataElement',
+                },
+              ],
+            })
+          }
+          if (type == 'text') {
+            pgEditor.pgEditorInstance.postmessage({
+              type: 'InsertString',
+              param: [content, true],
+            })
+          } else if (type == 'xml') {
+            pgEditor.pgEditorInstance.postmessage({
+              type: 'InsertDoc',
+              // param: [content, true, true]
+              param: [
+                {
+                  srcStr: content, //插入的xml
+                  removParagraphFlag: true, //是否移除最后换行符
+                  isKeepTrace: true, //是否保留痕迹
+                  // bussId: '', //业务id，标识插入的xml中的元素
+                  // undoRelateId: '', //撤销id，用来撤销某次插入的标识
+                  resetFontStyle: false, //是否重置样式
+                  changeFlag: true, //是否变色
+                  resetTitleToStr: true, //把标题重置成文本的
+                  // resetTitleDeletFlag: false//重置删除属性的
+                },
+              ],
+            })
+          } else if (type == 'table') {
+            await pgEditor.pgEditorInstance.postmessage({
+              type: 'InsertTableWithContent',
+              param: [content],
+            })
+
+            //设置列宽
+            const rn = pgEditor.pgEditorInstance.postmessage({
+              type: 'TextTableResizeColumns',
+              param: [
+                {
+                  //选填：文档Id,默认空即为全部文档均插入
+                  docId: this.currentDocId,
+                  //必填：概念Id/XID
+                  innerEleID: content.CptID, //'startDate',//表格内任意一个元素的概念id或xid
+                  /*"columnArr":[//选填
+                        {
+                            "colEleID":"",//选填：该列内任意一个元素的概念id或xid,若无则定位至对应索引值上
+                            //若既不设置fixWidth也不设置surplusWidth,则该列会在所有未设置的列中均等剩余宽度
+                            //fixWidth优先级高于surplusWidth
+                        },
+                        //-设置为"40px"或"40"或40,后该列将固定为40px
+                        {"fixWidth":40,},
+                        //-设置为"10font",后该列将固定为列中占位最大的[10个字符]的宽度
+                        {"fixWidth":"10font",},
+                        //-设置为"10%",后该列将固定为表格总宽的10%
+                        {"fixWidth":"10%",},
+                        //-仅可设置百分数,将在剩余的宽度里占据百分比
+                        {"surplusWidth":"40%"},
+                        //-特别的:所有列至少会维持列内占位最大的1个字符的宽度,设置过小的列宽将不被实现且维持真实最小宽度
+                    ]*/
+                  columnArr,
+                },
+              ],
+            })
+            console.log('TextTableResizeColumns:', rn)
+            if (alignParams) {
+              alignParams?.map((item) => {
+                item.docId = this.currentDocId
+              })
+              //设置居中
+              const rn2 = pgEditor.pgEditorInstance.postmessage({
+                type: 'SetTableAlign',
+                param: alignParams,
+              })
+
+              console.log('SetTableAlign', rn2)
+            }
+            if (needColspan) {
+              colSpanParams?.map((item) => {
+                item.docId = this.currentDocId
+              })
+              pgEditor.pgEditorInstance.postmessage({
+                type: 'UpdateBase',
+                param: colSpanParams,
+              })
+            }
+          }
+        }
+      } else {
+        this.$message({
+          message: '当前病历不可编辑！',
+          type: 'warning',
+        })
+      }
+    },
+    verifyElementWinIdInsertInto() {
+      // UserEditable:false
+      // cptId:"391004206"
+      // docId:"1627634105489"
+      // docName:null
+      // inputType:"text"
+      // isInTable:true
+      // xId:"xid-1631784386612-3899"
+      let { UserEditable, cptId, inputType, CurIsImage } =
+        this.pgEditorCurrentInputInfo
+
+      if (cptId) {
+        let signatureCptList = [...txtSignatureDataArray, ...signatureDataArray]
+        if (!UserEditable) {
+          this.$message({
+            message: '该内容区域不可编辑！',
+            type: 'warning',
+          })
+          return false
+        } else if (inputType !== 'text') {
+          this.$message({
+            message: '非文本区域不可插入！',
+            type: 'warning',
+          })
+          return false
+        } else if (cptId == DataElementWinIds.CONTINUOUS_TITLE_INPUT) {
+          this.$message({
+            message: '病程标题不可插入！',
+            type: 'warning',
+          })
+          return false
+        } else if (signatureCptList.includes(cptId)) {
+          this.$message({
+            message: '签名区域不可插入！',
+            type: 'warning',
+          })
+          return false
+        }
+        // else {
+        //   const basicWinIdList =
+        //     this.basicsDataElement?.data?.map((r) => r.conceptId) || []
+        //   if (basicWinIdList.includes(cptId) && isInTable) {
+        //     this.$message({
+        //       message: '患者基本信息区域不可插入！',
+        //       type: 'warning',
+        //     })
+        //     return false
+        //   }
+        // }
+        return true
+      } else if (CurIsImage) {
+        this.$message({
+          message: '签名区域不可插入！',
+          type: 'warning',
+        })
+        return false
+      }
+      return true
+    },
+    async saveClinicalnoteContentAsync(isShowProcess = true, inpatEmrSetId) {
+      inpatEmrSetId = inpatEmrSetId || this.currentDocId
+      isShowProcess && this.showClinicalnoteProcessing(true)
+      const params = await this.getBtnActionParams(inpatEmrSetId)
+      if (!params) return
+      console.log(params)
     },
     async currentDocIdHandler(v) {
       console.log('---laole', v)
@@ -163,8 +539,8 @@ export default {
 
       subDoc.permission = this.wrapOperationPermisstionData
       this.operationPermisstionData = {
-        editable: false,
-        permissionVOList: [],
+        editable: true,
+        permissionVOList: [{ appPermissionId: ['399297352'] }],
       }
     },
     setDocNewPage(prevDoc, doc) {
@@ -466,7 +842,7 @@ export default {
     async queryClinicalnotePermissionAsync() {
       return {
         editable: true,
-        permissionVOList: [],
+        permissionVOList: [{ appPermissionId: ['399297352'], enabled: true }],
       }
     },
     handleControlAnnotationBtn() {
@@ -628,6 +1004,427 @@ export default {
           },
         ],
       })
+    },
+    //自动暂存某一份病程时不一定是当前的病程
+    handleSaveAction: throttle(async function (emrSetId, isShowProcess = true) {
+      isShowProcess && this.showClinicalnoteProcessing(true)
+      emrSetId = emrSetId || this.currentDocId
+      const pgEditor = this.getEditor()
+      try {
+        //病程下的所有操作都要先切换成编辑模式
+        if (this.clinicalnoteData.serial) {
+          pgEditor.switchContentRenderMode(
+            DcEditorRenderModes.SET_WORK_MODE_APP
+          )
+        }
+
+        await this.saveClinicalnoteContentAsync(isShowProcess, emrSetId)
+      } finally {
+        isShowProcess && this.showClinicalnoteProcessing(false)
+        this.preservationStatus = true //允许自动保存
+      }
+    }, 1000),
+    //按钮操作参数统一
+    async getBtnActionParams(inpatEmrSetId) {
+      let clinicalnoteContent = await this.getClinicalnoteContent(inpatEmrSetId)
+      if (!clinicalnoteContent) {
+        this.showClinicalnoteProcessing(false)
+        console.error('住院病历前端-获取病历内容失败')
+        return
+      }
+      const { base64Str, structuralData, inpEmrContentBodyData } =
+        clinicalnoteContent
+
+      if (!base64Str || !structuralData) {
+        this.showClinicalnoteProcessing(false)
+        console.error('住院病历前端-获取病历内容失败')
+        return
+      }
+      let { serial, content } = this.clinicalnoteData
+      let inpatEmrRecordId = content.inpatEmrRecordId
+      if (serial) {
+        inpatEmrRecordId = content.list.find(
+          (el) => el.id == inpatEmrSetId
+        )?.inpatEmrRecordId
+      }
+      const { bizRoleId, encounterId } = this.currentPatientInfo
+      console.log(structuralData.dataElementData)
+      //修正诊断和补充诊断存在多个概念id加了-后缀 需要去除，如399336691-0
+      structuralData.dataElementData.forEach((item) => {
+        item.inpEmrDataElementWinId = item.inpEmrDataElementWinId?.split('-')[0]
+      })
+
+      let {
+        content: { inpMrtMonitorId },
+      } = this.clinicalnoteData
+
+      let operationBy = ''
+      if (inpMrtMonitorId == inpMrtMonitorIdEnum.SSJLD) {
+        let surgicalDoctorInfo = structuralData.dataElementData?.find((v) => {
+          return v.inpEmrDataElementWinId == '399336909'
+        })?.inpEmrDataElementValue
+        if (surgicalDoctorInfo) {
+          operationBy = surgicalDoctorInfo.split('#')[0]
+        }
+      }
+
+      return {
+        inpatEmrSetId,
+        emrRecordAddInfo: {
+          bizRoleId,
+          encounterId,
+          inpatEmrSetId,
+          inpatEmrRecordId,
+          operationBy,
+        },
+        emrContentAddInfo: {
+          inpEmrContentBodyData,
+          inpatEmrContentData: base64Str,
+        },
+        emrSectionAddInfos: structuralData.sectionData,
+        emrSectionDataElementAddInfos: structuralData.dataElementData,
+      }
+    },
+    //获取病历内容
+    async getClinicalnoteContent(inpatEmrSetId) {
+      const pgEditor = this.getEditor()
+      let param = inpatEmrSetId ? { docId: inpatEmrSetId } : {}
+      let xml = ''
+      if (this.clinicalnoteData.content.emrTypeId == '121383422926546950') {
+        xml = pgEditor.pgEditorInstance.postmessage({
+          type: 'SaveDocsAsXml',
+          param: [],
+        })
+      } else {
+        xml = pgEditor.pgEditorInstance.postmessage({
+          type: 'FileSave',
+          param: [param],
+        })[0]?.xml
+      }
+
+      const inpEmrContentBodyData = pgEditor.pgEditorInstance.postmessage({
+        type: 'FileSaveAsText',
+        param: [Object.assign({ onlyChecked: true }, param)],
+      })[0]?.text
+      const structuralData = {
+        sectionData: [],
+        dataElementData: [],
+      }
+      //标题
+      const sectionData = pgEditor.pgEditorInstance.postmessage({
+        type: 'GetXMLListWithTitle',
+        /*
+          getInputLabel   获取单位和前后缀，如体征数据
+          getHide         获取隐藏元素
+        */
+        param: [
+          Object.assign(
+            { getInputLabel: true, getHide: false, onlyChecked: true },
+            param
+          ),
+        ],
+      })
+      structuralData.sectionData = sectionData.map((r) => ({
+        inpatEmrSectionLevel: r.levelTerm,
+        inpEmrSectionNo: r.cptId,
+        inpatEmrSectionName: r.elementName,
+        inpatEmrSectionDisplayName: r.showName,
+        inpEmrSectionWinId: r.cptId,
+        // inpEmrSectionConceptId: r.cptId,
+        inpatEmrSectionPlainTxt: r.paragraphtext,
+        inpEmrSectionContent: compress(r.xml),
+      }))
+      //元素
+      const dataElementData = pgEditor.pgEditorInstance.postmessage({
+        type: 'GetElementListWithAttr',
+        param: [param],
+      })
+      console.log(dataElementData, 'dataElementData------')
+      let dataElementDataFilter = []
+
+      dataElementData.forEach((el) => {
+        el.valueList.reverse().forEach((ele) => {
+          if (ele.container === 'XTextBody') {
+            //相同cpt的元素嵌套，返回最外层那一个父元素
+            let _index = el.valueList.findIndex((v) => {
+              return (
+                ele.cptId == v.cptId &&
+                ele.parentXid &&
+                v.xid && //防止ele.parentXid和v.xid正好都为undefined
+                ele.parentXid == v.xid &&
+                v.container === 'XTextBody'
+              )
+            })
+            if (_index == -1) {
+              dataElementDataFilter.push(ele)
+            }
+            // else {
+            //   console.log('踢掉同cpt重复嵌套的', ele, el.valueList[_index])
+            // }
+          }
+          // else {
+          //   console.log('踢掉非病历body中的', ele)
+          // }
+        })
+      })
+      //处理表达式图片
+      dataElementDataFilter.forEach((el) => {
+        if (formulaElementTypes.includes(el.type)) {
+          dataElementDataFilter = [
+            ...getFormulaElementListWithAttr(el),
+            ...dataElementDataFilter,
+          ]
+        }
+      })
+      console.log(dataElementDataFilter, '2dataElementData------')
+
+      structuralData.dataElementData = dataElementDataFilter
+        .reverse() // 将上一次反转的数据修正
+        .map((r) => {
+          let inpEmrDataElementValue = []
+          //动态数据集结构化  由于可输入，数据可能匹配不上，需做处理
+          if (r?.DynamicDataValue?.length) {
+            let textArr = r.InnerValue?.trim()?.split('、')
+            //先处理能对应上的  code#text
+            for (let k = 0; k < textArr.length; k++) {
+              for (let i = 0; i < r.DynamicDataValue.length; i++) {
+                if (r.DynamicDataValue[i].value == textArr[k]) {
+                  inpEmrDataElementValue.push(
+                    r.DynamicDataValue[i].key +
+                      '#' +
+                      r.DynamicDataValue[i].value
+                  )
+                  textArr.splice(k, 1)
+                  k--
+                  break
+                }
+              }
+            }
+
+            if (textArr.length) {
+              //再处理能对应不上的  #text
+              for (let k = 0; k < textArr.length; k++) {
+                inpEmrDataElementValue.push('#' + textArr[k])
+              }
+            }
+          } else {
+            if (r.InnerValue) {
+              inpEmrDataElementValue.push(r.InnerValue.trim())
+              //添加此判断主要是为了获取签名图片地址
+            } else if (
+              r.value &&
+              typeof r.value == 'string' &&
+              !r.value?.startsWith('data:image/png;base64,')
+            ) {
+              inpEmrDataElementValue.push(r.value.trim())
+            } else {
+              inpEmrDataElementValue.push(r.value?.toString())
+            }
+          }
+
+          return {
+            /*sectionDataElementTypeCode 元素类型
+             *1 文本框
+             *2 单选下拉
+             *3 多选下拉
+             *4 日期
+             *5 数值框
+             *6 复选框
+             *7 单选框
+             *8 诊断
+             *9 用户签名
+             *14 图片base64
+             *15 图片url
+             */
+            sectionDataElementTypeCode: r.eleType,
+            inpEmrDataElementWinId: r.cptId,
+            inpEmrDataElementName: r.name,
+            inpEmrDataElementValue: inpEmrDataElementValue.join(','),
+            inpEmrSectionNo: r.titleCptId,
+          }
+        })
+      if (!this.clinicalnoteData.content.emrTypeId == '121383422926546950') {
+        //不是会诊就过滤空数据
+        structuralData.dataElementData = structuralData.dataElementData?.filter(
+          (v) => {
+            return v.inpEmrDataElementValue && v.inpEmrDataElementWinId
+          }
+        )
+      }
+
+      const base64Str = compress(xml)
+
+      console.log('编辑结果 ---------- ', {
+        base64Str,
+        structuralData,
+        inpEmrContentBodyData,
+        xml,
+      })
+      return {
+        base64Str,
+        structuralData,
+        inpEmrContentBodyData,
+        xml,
+      }
+    },
+    isDisableBtnById(id) {
+      return !this.wrapOperationPermisstionData.permissionVOList.find(
+        (item) => {
+          return item.appPermissionId == id && item.enabled
+        }
+      )
+    },
+    async saveAutoClinicalnoteContentAsync(inpatEmrSetId) {
+      this.preservationStatus = false //禁止自动保存
+      this.autoSaveLoading = true //是否自动保存中
+      inpatEmrSetId = inpatEmrSetId || this.currentDocId
+      const params = await this.getBtnActionParams(inpatEmrSetId)
+      if (!params) {
+        this.preservationStatus = true
+        this.autoSaveLoading = false
+        return
+      }
+
+      console.log('保存', params)
+      this.autoSaveLoading = false
+    },
+    async handleAutoSaveAction(saveDocIdList) {
+      const clinicalnoteData = this.clinicalnoteData
+
+      if (clinicalnoteData.serial) {
+        for (let i = 0; i < saveDocIdList.length; i++) {
+          await this.saveAutoClinicalnoteContentAsync(saveDocIdList[i].docId)
+          // await this.sendingDataSourceInformation(true, saveDocIdList[i].docId) //其他数据源信息
+        }
+      } else {
+        await this.saveAutoClinicalnoteContentAsync()
+        // await this.sendingDataSourceInformation(
+        //   false,
+        //   this.currentActiveLoadedClinicalnote.options.content.emrSetId
+        // ) //其他数据源信息
+      }
+      // //重新获取病历的状态并设置状态图片
+      // this.handleRefreshClinicalnoteForStatus()
+    },
+    //自动保存判断
+    async whetherAutoSave() {
+      let {
+        content: { modifiedAt, emrSetTitle },
+      } = this.clinicalnoteData
+      let title = emrSetTitle + modifiedAt
+      const pgEditor = this.getEditor()
+      if (!this.preservationStatus) {
+        return {
+          status: false,
+          message: '当前正在保存禁止自动保存' + title,
+        }
+      }
+
+      // if (this.mode !== DcEditorRenderModes.SET_WORK_MODE_APP) {
+      //   return {
+      //     status: false,
+      //     message: '非编辑模式不处理' + title,
+      //   }
+      // }
+
+      let docHasChangedData = pgEditor?.pgEditorInstance.postmessage({
+        type: 'DocHasChanged',
+        param: [],
+      })
+      let docHasChangedDataClone = JSON.parse(JSON.stringify(docHasChangedData))
+      console.log(docHasChangedDataClone, 'docHasChangedDataClone')
+
+      if (this.clinicalnoteData.serial) {
+        //去掉没有权限的(离线病历都有权限注销)
+        // for (let i = 0; i < docHasChangedDataClone?.length; i++) {
+        //   let jurisdiction = this.loadedSubDocList
+        //     .find((item) => item.id == docHasChangedDataClone[i].docId)
+        //     ?.permission.permissionVOList?.some(
+        //       (item) =>
+        //         item.appPermissionId ==
+        //           this.operationActionPermisstionIds.SNASER && item.enabled
+        //     )
+        //   if (!jurisdiction) {
+        //     docHasChangedDataClone.splice(i, 1)
+        //     i--
+        //   }
+        // }
+        if (docHasChangedDataClone.length) {
+          return {
+            status: true,
+            saveDocIdList: docHasChangedDataClone,
+            message: '当前操作的病历内容发生改变(连续病程)',
+          }
+        } else {
+          return {
+            status: false,
+            message: '当前操作的病历内容未发生改变(连续病程)',
+          }
+        }
+      } else {
+        let operatingAuthorization =
+          this.isShowBtnById(this.operationActionPermisstionIds.SNASER) &&
+          !this.isDisableBtnById(this.operationActionPermisstionIds.SNASER)
+        if (docHasChangedDataClone?.length && operatingAuthorization) {
+          return {
+            status: true,
+            message: '当前操作的病历内容发生改变(普通病历)' + title,
+          }
+        } else {
+          return {
+            status: false,
+            message:
+              '当前操作的病历内容未发生改变或者没有暂存权限(普通病历)' + title,
+          }
+        }
+      }
+    },
+    //关闭当前病历判断是否保存
+    handleTabRemove(id, fn) {
+      const { serial } = this.clinicalnoteData
+      if (
+        this.currentDocId == id ||
+        (id == this.currentPatientInfo.encounterId + '121383422926546946' &&
+          serial)
+      ) {
+        //因隐藏时关闭无法获取内容比较或者获取的内容有问题所以只对当前激活的窗口进行提示
+        console.log('当前显示的窗口', this.clinicalnoteData.content)
+        let operatingAuthorization = !this.isDisableBtnById(
+          this.operationActionPermisstionIds.SNASER
+        )
+        if (!operatingAuthorization) {
+          fn()
+          return
+        }
+
+        this.whetherAutoSave().then((res) => {
+          if (res.status) {
+            this.$confirm('当前输入的内容未保存,请先暂存后再关闭', '提示框', {
+              distinguishCancelAndClose: true,
+              confirmButtonText: '保存',
+              cancelButtonText: '暂不保存',
+              type: 'warning',
+            })
+              .then(async () => {
+                await this.handleAutoSaveAction(res.saveDocIdList)
+                debugger
+                fn()
+              })
+              .catch((action) => {
+                if (action === 'cancel') {
+                  fn()
+                } else {
+                  // this.setAutosaveTiming()
+                }
+              })
+          } else {
+            console.log(res.message)
+            fn()
+          }
+        })
+      } else {
+        fn()
+      }
     },
   },
 }

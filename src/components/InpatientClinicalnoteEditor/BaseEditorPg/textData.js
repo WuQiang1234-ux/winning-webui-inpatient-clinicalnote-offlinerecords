@@ -3,7 +3,7 @@ export const data1 = {
   errorDetail: null,
   data: {
     inpatientEMRSetOutputDTO: {
-      inpatEmrSetId: '243822145084342273',
+      inpatEmrSetId: '229171440445493248',
       inpatEmrRecordId: '243822145084342273',
       inpatientMrtId: '218189056610484253',
       inpatEmrTypeId: '121383422926546956',
@@ -2389,7 +2389,7 @@ export const data2 = {
     topContent: null,
   },
   appid: '4003',
-  traceid: 'cab904275166dd83',
+  traceid: 'e05eacee58626814',
   hostip: '172.16.7.62',
   warnCode: null,
   warnMsg: null,

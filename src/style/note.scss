@@ -1,0 +1,81 @@
+* {
+  box-sizing: border-box;
+}
+
+body,
+html {
+  width: 100%;
+  height: 100%;
+}
+
+:root {
+  --pango-editor-theme: #2d5afa;
+  --pango-editor-theme-hover: #5175f4;
+  --pango-editor-theme-press: #1d39c4;
+  --pango-editor-theme-table-head: #eaeefe;
+  --pango-editor-theme-back-select: #f3f5ff;
+  --pango-editor--prompt-fail-color: #ec0000;
+  --pango-editor--background: #f2f4f6;
+  --pango-editor--input-border-color: #c9c9c9;
+  --pango-editor--input-font-color: #000000;
+  --pango-editor--input-placeholder-color: #999999;
+  --pango-editor--input-border-hover-color: #999999;
+  --pango-editor--input-border-active-color: var(--pango-editor-theme-press);
+  --pango-editor--input-border-active-shadow-color: var(
+    --pango-editor-theme-back-select
+  );
+  --pango-editor--input-icon-color: #7e89a4;
+  --pango-editor--input-icon-active-color: var(--pango-editor-theme-press);
+  --pango-editor--input-border-validate-color: var(
+    --pango-editor--prompt-fail-color
+  );
+  --pango-editor--input-border-validate-shadow-color: #f8ebeb;
+  --pango-editor--border-input-color: #e9e9e9;
+  --pango-editor--font-sub-title-color: #333333;
+  --pango-editor--input-font-disabled-color: #999999;
+  --pango-editor--fs12px: 12px;
+  --pango-editor--fs13px: 13px;
+  --pango-editor--fs14px: 14px;
+  --pango-editor--fs15px: 15px;
+  --pango-editor--fs16px: 16px;
+  --pango-editor--fs17px: 17px;
+  --pango-editor--fs18px: 18px;
+  --plyr-captions-background: transparent;
+  --plyr-captions-text-color: rgb(0, 175, 255);
+  --plyr-video-control-background-hover: rgba(0, 0, 0, 0.5);
+  --plyr-font-size-large: 24px;
+  font-size: 16px;
+  --COLOR-THEME: default;
+  --COLOR-NORMAL: #2d5afa;
+  --COLOR-NORMAL-RGB: 45, 90, 250;
+  --COLOR-HOVER: #5175f4;
+  --COLOR-BTN-TABLE-HEADER-BG: #eaeefe;
+  --COLOR-PRESS: #1d39c4;
+  --COLOR-ACTIVE-BG: #f3f5ff;
+  --HEADER-BOTTOM-LINE-TYPE1: #5175f4;
+  --HEADER-BOTTOM-LINE-TYPE2: #eaeefe;
+  --HEADER-FONT-COLOR: #41edff;
+  --HEADER-TAB-BORDER: 4px;
+  --HEADER-TAB-BORDER-COLOR: #41edff;
+  --LINER-START: rgba(234, 238, 254, 0);
+  --LINER-STOP: rgba(234, 238, 254, 0.2);
+  --QC-HP-FONT-SIZE: 14px;
+  --COLOR-QC-HP-GLOBALBG: #fff;
+  --COLOR-QC-HP-LABEL: #000;
+  --WEIGHT-QC-HP-LABEL: normal;
+  --COLOR-QC-HP-TIPS: #666;
+  --WEIGHT-QC-HP-TIPS: normal;
+  --COLOR-QC-HP-INPUT-TEXT: #2d5afa;
+  --WEIGHT-QC-HP-INPUT-TEXT: normal;
+  --COLOR-QC-HP-INPUT-UNDERLINE: #666;
+  --COLOR-QC-HP-INPUT-BG: #fff;
+  --COLOR-QC-HP-INPUT-BG-QCTYPE: #f3f5ff;
+  --COLOR-QC-HP-FOCUS-TEXT: #2d5afa;
+  --WEIGHT-QC-HP-FOCUS-TEXT: normal;
+  --COLOR-QC-HP-FOCUS-BORDER: #2d5afa;
+  --COLOR-QC-HP-FOCUS-BG: #fff;
+  --COLOR-QC-HP-FOCUS-BORDER-QCTYPE: #fff;
+  --COLOR-QC-HP-FOCUS-BG-QCTYPE: #d5defe;
+  --COLOR-QC-HP-TABLE-HEADER: #e9f0fa;
+  --COLOR-QC-HP-TABLE-CURRENT: #eaeefe;
+}

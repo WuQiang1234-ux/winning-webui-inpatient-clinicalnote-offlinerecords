@@ -1,5 +1,5 @@
 <template>
-  <div class="multi-clinicalnote-board-wrap">
+  <div v-loading="clinicalnoteProcessing" class="multi-clinicalnote-board-wrap">
     <div class="multi-clinicalnote-board-content">
       <!--编辑器只需要 普通病历、连续病程、只读的、会诊记录   其他的通过参数区分即可   -->
       <el-tabs
@@ -45,11 +45,14 @@
 <script>
 /*eslint no-undef: "error"*/
 // import api from '@/api/list'
+import { createNamespacedHelpers } from 'vuex'
 import InpatientClinicalnoteEditor from '../InpatientClinicalnoteEditor/index.vue'
 // import MedicalRecordContainer from '../MedicalRecordContainer'
 import ConsultationEditor from '../InpatientClinicalnoteEditor/consultationEditor'
 import readonlyEditor from '../InpatientClinicalnoteEditor/readonlyEditor'
-
+const { mapState: componentsMapStates } = createNamespacedHelpers(
+  'components/multiClinicalnoteBoardState'
+)
 import { createEventKeyWithNamespace } from '@/utils/event_hub_helper.js'
 import { ClinicalnoteEditorEventKeys } from '@/components/InpatientClinicalnoteEditor'
 
@@ -97,6 +100,7 @@ export default {
     }
   },
   computed: {
+    ...componentsMapStates(['clinicalnoteProcessing']),
     clinicalnoteTypes() {
       return ClinicalnoteTypes
     },
@@ -136,11 +140,6 @@ export default {
       if (this.patientRootComponent.loadedClinicalnoteIdList.length == 0) {
         this.patientRootComponent.clearLoadedClinicalnoteList()
       }
-
-      window.eventBus.$emit(
-        'qualityCntrolActivateMedicalHistoryData',
-        this.patientRootComponent.currentActiveLoadedClinicalnote
-      )
     },
     async handleTabRemove(id, action) {
       console.log(id, action, '关闭呀关闭-----')
@@ -165,13 +164,13 @@ export default {
       if (action === 'delete' || flag) {
         this.handleDoDelete(id)
       } else {
-        // this.$root.eventHub.$emit(
-        //   ClinicalnoteEditorEventKeys.MEDICAL_RECORDS_BEFORE_DELETION,
-        //   id,
-        //   () => {
-        //     this.handleDoDelete(id)
-        //   }
-        // )
+        this.$root.eventHub.$emit(
+          ClinicalnoteEditorEventKeys.MEDICAL_RECORDS_BEFORE_DELETION,
+          id,
+          () => {
+            this.handleDoDelete(id)
+          }
+        )
       }
     },
     handleTabClick(tab) {

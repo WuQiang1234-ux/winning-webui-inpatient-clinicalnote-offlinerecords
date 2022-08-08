@@ -37,9 +37,9 @@ export default {
 </script>
 <style lang="scss" scoped>
 .inpatient-emr-navigate-panel-wrap {
-  width: 300px;
+  width: 500px;
   height: 100%;
-  margin-right: 10px;
+  // margin-right: 10px;
   .inpatient-emr-navigate-panel {
     display: flex;
     height: 100%;
