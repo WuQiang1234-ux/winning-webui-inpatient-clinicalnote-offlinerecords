@@ -35,7 +35,7 @@ let mixin = {
     },
   },
   created() {
-    this.eventHubHelper = getEventHubHelper(this.$root.eventHub)
+    this.eventHubHelper = getEventHubHelper(this.patientRootComponent.eventHub)
   },
   beforeDestroy() {
     this.eventHubHelper.destroy()
@@ -54,7 +54,7 @@ let mixin = {
       const { id, label, emrClass } = data
       const hasFlag = this.hasInLoadedClinicalnoteList(id)
       if (!hasFlag) {
-        this.patientRootComponent.addToLoadedClinicalnoteList({
+        let obj = {
           id,
           type,
           title: label,
@@ -80,7 +80,9 @@ let mixin = {
               paragraphIds: [], //短语引用需要根据段落筛选分类
             },
           },
-        })
+        }
+        console.log(obj, '======0==========')
+        this.patientRootComponent.addToLoadedClinicalnoteList(obj)
       }
 
       this.patientRootComponent.setCurrentActiveClinicalnoteById(id)
@@ -96,7 +98,7 @@ let mixin = {
       let _uniqueId = this.currentPatientInfo.encounterId + emrTypeId
       const hasFlag = this.hasInLoadedClinicalnoteList(_uniqueId)
       if (!hasFlag) {
-        this.patientRootComponent.addToLoadedClinicalnoteList({
+        let obj = {
           id: _uniqueId,
           title: emrTypeName,
           loading: true,
@@ -122,7 +124,8 @@ let mixin = {
               paragraphIds: [], //短语引用需要根据段落筛选分类
             },
           },
-        })
+        }
+        this.patientRootComponent.addToLoadedClinicalnoteList(obj)
       }
       this.patientRootComponent.setCurrentActiveClinicalnoteById(_uniqueId)
       //连续病历更新成当前查看病历的id todo 需要处理

@@ -155,7 +155,7 @@ export default {
     },
   },
   created() {
-    this.eventHubHelper = getEventHubHelper(this.$root.eventHub)
+    this.eventHubHelper = getEventHubHelper(this.patientRootComponent.eventHub)
     this.pgEditor = null
   },
   async mounted() {

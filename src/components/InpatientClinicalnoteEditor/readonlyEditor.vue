@@ -1,22 +1,16 @@
-<template>
-  <div></div>
-</template>
-
 <script>
+import pgBaseEditor from './BaseEditorPg'
+export * from './BaseEditorPg'
 export default {
-  name: '',
+  name: 'InpatientClinicalnoteEditor',
   components: {},
-  props: {},
+  extends: pgBaseEditor,
   data() {
     return {}
   },
   computed: {},
-  watch: {},
-  created() {},
   mounted() {},
-  methods: {},
 }
 </script>
 
-<style scoped lang="scss">
-</style>
+<style lang="scss" scoped></style>

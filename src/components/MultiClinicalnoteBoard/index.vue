@@ -45,6 +45,7 @@
 <script>
 /*eslint no-undef: "error"*/
 // import api from '@/api/list'
+import getEventHubHelper from '@/utils/event_hub_helper.js'
 import { createNamespacedHelpers } from 'vuex'
 import InpatientClinicalnoteEditor from '../InpatientClinicalnoteEditor/index.vue'
 // import MedicalRecordContainer from '../MedicalRecordContainer'
@@ -113,7 +114,9 @@ export default {
       set() {},
     },
   },
-  created() {},
+  created() {
+    this.eventHubHelper = getEventHubHelper(this.patientRootComponent.eventHub)
+  },
   mounted() {},
   beforeDestroy() {},
   methods: {
@@ -164,12 +167,13 @@ export default {
       if (action === 'delete' || flag) {
         this.handleDoDelete(id)
       } else {
-        this.$root.eventHub.$emit(
+        this.eventHubHelper.emit(
           ClinicalnoteEditorEventKeys.MEDICAL_RECORDS_BEFORE_DELETION,
           id,
           () => {
             this.handleDoDelete(id)
-          }
+          },
+          this.patientRootComponent.currentPatientInfo.encounterId
         )
       }
     },
@@ -179,13 +183,22 @@ export default {
       )
         return
       this.patientRootComponent.setCurrentActiveClinicalnoteById(tab.name)
-      if (this.currentActiveLoadedClinicalnoteId.includes('readonly')) return
+      if (
+        this.patientRootComponent.currentActiveLoadedClinicalnoteId.includes(
+          'readonly'
+        )
+      )
+        return
       let currentClinicalnote =
         this.patientRootComponent.loadedClinicalnoteList[tab.index]
       let id = this.getEmrSetId(currentClinicalnote)
+      console.log(
+        currentClinicalnote.options.content.emrTypeId,
+        'currentClinicalnote.options.content.emrTypeId'
+      )
       this.eventHubHelper.emit(MultiClinicalnoteBoardEventKeys.TAB_CLICK, {
         id,
-        typeId: currentClinicalnote.emrTypeId,
+        typeId: currentClinicalnote.options.content.emrTypeId,
       })
     },
 

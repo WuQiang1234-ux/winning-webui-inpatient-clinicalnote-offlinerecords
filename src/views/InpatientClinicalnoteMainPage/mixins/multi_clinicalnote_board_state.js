@@ -1,4 +1,5 @@
 import { ClinicalnoteTypes } from '@/components/MultiClinicalnoteBoard'
+import Vue from 'vue'
 let mixin = {
   provide() {
     return {
@@ -10,6 +11,7 @@ let mixin = {
       currentActiveLoadedClinicalnote: {},
       loadedClinicalnoteList: [],
       currentPatientInfo: null, //当前区域的患者信息
+      eventHub: new Vue(),
     }
   },
   computed: {
@@ -21,6 +23,9 @@ let mixin = {
       return loadedClinicalnoteList.map((item) => {
         return item.id
       })
+    },
+    currentActiveLoadedClinicalnoteId() {
+      return this.currentActiveLoadedClinicalnote?.id ?? ''
     },
   },
   mounted() {

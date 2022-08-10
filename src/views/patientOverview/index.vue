@@ -83,7 +83,7 @@ export default {
       height: calc(100% - 60px);
       display: flex;
       .container-letft-patient-list {
-        width: 200px;
+        min-width: 200px;
         height: 100%;
       }
     }

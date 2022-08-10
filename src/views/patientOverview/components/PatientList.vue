@@ -9,7 +9,9 @@
         :key="item.encounterId"
       >{{item.name}}</li>
     </ul>
-    <div class="patient-list-add" @click="addPatient">新 增</div>
+    <div class="patient-list-add">
+      <el-button type="primary" @click="addPatient">新增患者</el-button>
+    </div>
   </div>
 </template>
 
@@ -92,16 +94,15 @@ export default {
   }
   .patient-list-add {
     position: absolute;
+    padding-bottom: 6px;
     bottom: 0;
-    width: 80%;
-    background: #ccc;
+    width: 100%;
+    background: #fff;
     height: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    border: 1px solid #1d39c4;
-    left: 10%;
     border-radius: 5px;
   }
 }

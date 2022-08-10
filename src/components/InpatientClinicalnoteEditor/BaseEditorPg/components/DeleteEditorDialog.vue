@@ -20,18 +20,16 @@
 <script>
 import { createNamespacedHelpers, mapState } from 'vuex'
 import getEventHubHelper, {
-  createEventKeyWithNamespace
+  createEventKeyWithNamespace,
 } from '@/utils/event_hub_helper.js'
 const createEventKey = createEventKeyWithNamespace(
   'INPATIENT_CLINICALNOTE_EDITOR_EVENT'
 )
 export const ClinicalnoteEditorEventKeys = {
-  HANDLE_CLOSE_CLINICALNOTE: createEventKey('HANDLE_CLOSE_CLINICALNOTE')
+  HANDLE_CLOSE_CLINICALNOTE: createEventKey('HANDLE_CLOSE_CLINICALNOTE'),
 }
-const {
-  mapState: componentsMapStates,
-  mapMutations: componentsMapMutations
-} = createNamespacedHelpers('components/multiClinicalnoteBoardState')
+const { mapState: componentsMapStates, mapMutations: componentsMapMutations } =
+  createNamespacedHelpers('components/multiClinicalnoteBoardState')
 
 export default {
   name: '',
@@ -40,16 +38,16 @@ export default {
     documentUpdatePromptDialogVisible: Boolean,
     currentDocId: {
       type: String,
-      default: ''
+      default: '',
     },
     clinicalnoteData: {
       type: Object,
-      default: () => ({})
+      default: () => ({}),
     },
     loadedSubDocList: {
       type: Array,
-      default: () => []
-    }
+      default: () => [],
+    },
   },
   data() {
     return {
@@ -58,25 +56,25 @@ export default {
       deleteData: {
         type: '',
         subDocId: '',
-        id: ''
-      }
+        id: '',
+      },
     }
   },
   computed: {
     ...componentsMapStates([
       'currentActiveLoadedClinicalnote',
-      'pgEditorCurrentInputInfo'
+      'pgEditorCurrentInputInfo',
     ]),
     ...mapState([
       'qualityControlData',
       'currentPatientInfo',
       'userInfo',
-      'orgInfo'
-    ])
+      'orgInfo',
+    ]),
   },
   watch: {},
   created() {
-    this.eventHubHelper = getEventHubHelper(this.$root.eventHub)
+    this.eventHubHelper = getEventHubHelper(this.patientRootComponent.eventHub)
   },
   mounted() {
     window.eventBus.$on('TASK_INFORM', this.tastInform)
@@ -103,7 +101,7 @@ export default {
       //   sourceType: 'ZY_YSZ_CLI_ALL',
       //   taskVariable:'{"encounterId":"184791116019169280","inpatEmrSetId":"195988716403132417"}'
       // })
-      await new Promise(res => {
+      await new Promise((res) => {
         setTimeout(() => {
           res()
         }, 1500)
@@ -124,7 +122,7 @@ export default {
           //连续
           this.$parent.handleDeleteInSerialClinicalnote({
             id: this.deleteData.id,
-            subDocId: this.deleteData.subDocId
+            subDocId: this.deleteData.subDocId,
           })
         } else {
           this.eventHubHelper.emit(
@@ -157,14 +155,14 @@ export default {
         this.deleteData = {
           type: 'serial',
           subDocId: this.currentActiveLoadedClinicalnote.id,
-          id: subDocId
+          id: subDocId,
         }
       } else {
         //普通
         this.deleteData = {
           type: '',
           subDocId: this.currentActiveLoadedClinicalnote.id,
-          id: this.currentActiveLoadedClinicalnote.id
+          id: this.currentActiveLoadedClinicalnote.id,
         }
       }
       this.deleteEditorAffirm()
@@ -254,7 +252,7 @@ export default {
           this.clinicalnoteData.serial &&
           data.inpatEmrTypeId == '121383422926546946'
         ) {
-          let _index = this.loadedSubDocList.findIndex(el => {
+          let _index = this.loadedSubDocList.findIndex((el) => {
             return el.id == data.inpatEmrSetId
           })
           if (_index >= 0) {
@@ -263,7 +261,7 @@ export default {
             this.deleteData = {
               type: 'serial',
               subDocId: data.inpatEmrSetId,
-              id: data.encounterId + data.inpatEmrTypeId
+              id: data.encounterId + data.inpatEmrTypeId,
             }
           }
         } else {
@@ -274,13 +272,13 @@ export default {
             this.deleteData = {
               type: '',
               subDocId: data.inpatEmrSetId,
-              id: data.inpatEmrSetId
+              id: data.inpatEmrSetId,
             }
           }
         }
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

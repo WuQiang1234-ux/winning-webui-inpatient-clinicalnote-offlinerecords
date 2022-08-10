@@ -8,14 +8,13 @@ const routes = [
   {
     path: '/',
     redirect: '/patientOverview',
-
   },
   {
     path: '/patientOverview',
     name: 'patientOverview',
     component: patientOverview,
-    children: []
-  }
+    children: [],
+  },
   // {
   //   path: '/about',
   //   name: 'About',
@@ -27,7 +26,7 @@ const routes = [
 ]
 
 const router = new VueRouter({
-  routes
+  routes,
 })
 
 export default router

@@ -12,18 +12,29 @@
         <el-button type="primary" size="mini" @click="showEmrCreateDialog">新增</el-button>
       </section>
     </div>
+    <clinicalnote-creator-dialog
+      :emrCreateDialogData="emrCreateDialogData"
+      v-if="emrCreateDialogData.isShow"
+      @clinicalnoteCreated="handleTabChange(selectedTab)"
+    />
   </div>
 </template>
 
 <script>
 import EmrTree from './EmrTree'
+import ClinicalnoteCreatorDialog from './ClinicalnoteCreatorDialog'
 export default {
   name: 'InpatientEmrNavigatePanel',
   components: {
     EmrTree,
+    ClinicalnoteCreatorDialog,
   },
   data() {
-    return {}
+    return {
+      emrCreateDialogData: {
+        isShow: false,
+      },
+    }
   },
   computed: {},
   watch: {},
@@ -31,13 +42,18 @@ export default {
   mounted() {},
   beforeDestroy() {},
   methods: {
-    showEmrCreateDialog() {},
+    showEmrCreateDialog() {
+      this.emrCreateDialogData.isShow = true
+    },
+    handleTabChange() {
+      this.$refs.emrTree.getClinicalnoteTree()
+    },
   },
 }
 </script>
 <style lang="scss" scoped>
 .inpatient-emr-navigate-panel-wrap {
-  width: 500px;
+  min-width: 300px;
   height: 100%;
   // margin-right: 10px;
   .inpatient-emr-navigate-panel {

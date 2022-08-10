@@ -8,6 +8,7 @@
 </template>
 
 <script>
+import getEventHubHelper from '@/utils/event_hub_helper.js'
 export default {
   name: '',
   components: {},
@@ -18,13 +19,15 @@ export default {
   inject: ['patientRootComponent'],
   computed: {},
   watch: {},
-  created() {},
+  created() {
+    this.eventHubHelper = getEventHubHelper(this.patientRootComponent.eventHub)
+  },
   mounted() {},
   methods: {
     //插入病历
     insertMedical() {
       let str = '测试'
-      this.$root.eventHub.$emit('AuxiliaryInfo/Insert', {
+      this.eventHubHelper.emit('AuxiliaryInfo/Insert', {
         isReplace: false,
         type: 'text',
         content: str,

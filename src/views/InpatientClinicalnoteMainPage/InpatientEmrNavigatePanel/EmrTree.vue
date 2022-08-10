@@ -5,6 +5,7 @@
       class="emr-tree"
       :data="clinicalnoteTreeData"
       node-key="id"
+      :default-expanded-keys="treeDefaultExpandedKeys"
       :expand-on-click-node="true"
       :render-after-expand="false"
       :current-node-key="currentEmrSetId"
@@ -38,6 +39,8 @@
 <script>
 import dayjs from 'dayjs'
 import { debounce } from '@/utils/index'
+import getEventHubHelper from '@/utils/event_hub_helper.js'
+import { MultiClinicalnoteBoardEventKeys } from '@/components/MultiClinicalnoteBoard'
 import { treeData } from './aa'
 import mixin from './mixins'
 export default {
@@ -49,6 +52,7 @@ export default {
     return {
       treeLoading: false,
       clinicalnoteTreeData: [],
+      treeDefaultExpandedKeys: [], //树展开的目录id
     }
   },
   computed: {},
@@ -56,10 +60,20 @@ export default {
   created() {},
   mounted() {
     this.setClinicalnoteTreeData()
+    this.eventHubHelper = getEventHubHelper(this.patientRootComponent.eventHub)
+    const eventHubHelper = this.eventHubHelper
+    eventHubHelper.on(
+      MultiClinicalnoteBoardEventKeys.TAB_CLICK,
+      this.handleMutiClinicalnoteBoardTabClick
+    )
+  },
+  beforeDestroy() {
+    this.eventHubHelper.destroy()
   },
   methods: {
     setClinicalnoteTreeData() {
       this.clinicalnoteTreeData = this.filterClinicalnoteTreeData(treeData.data)
+      console.log(this.clinicalnoteTreeData, 'this.clinicalnoteTreeData ')
     },
     filterClinicalnoteTreeData(data) {
       // let hasAnyEmrCreated = false
@@ -135,8 +149,23 @@ export default {
     },
     handleMouseEnter() {},
     handleContextMenu() {},
+    handleMutiClinicalnoteBoardTabClick(data) {
+      if (typeof data == 'object') {
+        this.treeDefaultExpandedKeys.push(data.typeId)
+        console.log(this.treeDefaultExpandedKeys, 'data.typeId')
+        setTimeout(() => {
+          console.log(this.$refs[data.id], 'this.$refs[data.id]')
+          this.$refs[data.id].click()
+        })
+      } else {
+        setTimeout(() => {
+          this.$refs[data].click()
+        })
+      }
+    },
     //加防抖（修复连续点击树形控件会请求多次导致连续病历出现重复）
     handleNodeClick: debounce(function (data) {
+      console.log(data, '=-----')
       if (data.isRoot) return
       //公共参数处理
       if (!data.children) {

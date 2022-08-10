@@ -45,6 +45,7 @@ import {
   DcEditorRenderModes,
   DataElementWinIds,
 } from '@/libs/PgEditor/constants'
+import getEventHubHelper from '@/utils/event_hub_helper.js'
 import { cb2promise } from '@/utils/convertFunction'
 import PgEditor from '@/libs/PgEditor'
 import { data1, data2 } from './textData'
@@ -192,6 +193,7 @@ export default {
   },
   created() {
     console.log('来了created')
+    this.eventHubHelper = getEventHubHelper(this.patientRootComponent.eventHub)
     this.currentDocIdWatch = this.$watch(
       'currentDocId',
       this.currentDocIdHandler,
@@ -202,27 +204,19 @@ export default {
     )
   },
   beforeDestroy() {
-    //辅助区域向病历编辑器插入内容
-    this.$root.eventHub.$off(
-      'AuxiliaryInfo/Insert',
-      this.handleAuxiliaryInfoInsert
-    )
     const pgEditor = this.getEditor()
     pgEditor.eventEmitter.$off(
       EditorEvent.PG_EVENT_ON_CURSOR_CHANGED,
       this.handleDocumentClick
     )
-    this.$root.eventHub.$off(
-      ClinicalnoteEditorEventKeys.MEDICAL_RECORDS_BEFORE_DELETION,
-      this.handleTabRemove
-    )
+    this.eventHubHelper.destroy()
     console.log('清掉', this.currentDocIdWatch)
     this.currentDocIdWatch()
   },
   mounted() {
     //辅助区域向病历编辑器插入内容
     console.log(this.$root.eventHub)
-    this.$root.eventHub.$on(
+    this.eventHubHelper.on(
       'AuxiliaryInfo/Insert',
       this.handleAuxiliaryInfoInsert
     )
@@ -231,7 +225,7 @@ export default {
       EditorEvent.PG_EVENT_ON_CURSOR_CHANGED,
       this.handleDocumentClick
     )
-    this.$root.eventHub.$on(
+    this.eventHubHelper.on(
       ClinicalnoteEditorEventKeys.MEDICAL_RECORDS_BEFORE_DELETION,
       this.handleTabRemove
     )
@@ -285,14 +279,19 @@ export default {
         alignParams, //表格对齐方式
         needColspan, //表格是否要合并单元格
         colSpanParams, // 表格合并单元格的入参
-        encounterId,
       } = $event
-      if (encounterId !== this.currentPatientInfo.encounterId) return
       console.log($event, '###')
       // if (this.isShowConsultationCreator) {
       //   return
       // }
       //非当前激活的病历不更新
+      // console.log(
+      //   this.currentDocId,
+      //   this.patientRootComponent.currentActiveLoadedClinicalnote.options
+      //     .content.emrSetId,
+      //   'kkkkkkkkkkkkkkkkkk'
+      // )
+
       if (
         this.currentDocId !==
         this.patientRootComponent.currentActiveLoadedClinicalnote.options
@@ -876,6 +875,7 @@ export default {
       if (inpatientEMRContentDTO?.inpatEmrContentData) {
         xml = decompress(inpatientEMRContentDTO.inpatEmrContentData)
       }
+
       return {
         emrSetId: inpatientEMRSetOutputDTO.inpatEmrSetId,
         emrSetTitle: inpatientEMRSetOutputDTO.inpatEmrSetTitle,
@@ -1380,7 +1380,8 @@ export default {
       }
     },
     //关闭当前病历判断是否保存
-    handleTabRemove(id, fn) {
+    handleTabRemove(id, fn, encounterId) {
+      if (encounterId !== this.currentPatientInfo.encounterId) return
       const { serial } = this.clinicalnoteData
       if (
         this.currentDocId == id ||
@@ -1407,7 +1408,7 @@ export default {
             })
               .then(async () => {
                 await this.handleAutoSaveAction(res.saveDocIdList)
-                debugger
+
                 fn()
               })
               .catch((action) => {

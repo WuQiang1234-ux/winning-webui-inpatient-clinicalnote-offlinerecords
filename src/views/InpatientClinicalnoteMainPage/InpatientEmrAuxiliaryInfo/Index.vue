@@ -25,7 +25,7 @@
 
 <script>
 // /*global $:true*/
-import $ from 'jquery'
+// import $ from 'jquery'
 import NursingInfo from './NursingInfo/Index.vue'
 export default {
   name: 'InpatientEmrAuxiliaryInfo',
@@ -69,19 +69,19 @@ export default {
       deep: true,
       immediate: true,
     },
-    isShowContent: {
-      handler: function (v) {
-        if (v) {
-          $('.auxiliary-info-tab .el-tabs__content').show()
-          $('.rightFixedAuxiliarySection .auxiliary').css({ width: '600px' })
-        } else {
-          $('.auxiliary-info-tab .el-tabs__content').hide()
-          $('.rightFixedAuxiliarySection .auxiliary').css({ width: 'auto' })
-        }
-      },
-      deep: true,
-      immediate: true,
-    },
+    // isShowContent: {
+    //   handler: function (v) {
+    //     if (v) {
+    //       $('.auxiliary-info-tab .el-tabs__content').show()
+    //       $('.rightFixedAuxiliarySection .auxiliary').css({ width: '600px' })
+    //     } else {
+    //       $('.auxiliary-info-tab .el-tabs__content').hide()
+    //       $('.rightFixedAuxiliarySection .auxiliary').css({ width: 'auto' })
+    //     }
+    //   },
+    //   deep: true,
+    //   immediate: true,
+    // },
     currentPatientInfo: {
       handler: function () {
         this.auxiliaryInfoKey = +new Date()
