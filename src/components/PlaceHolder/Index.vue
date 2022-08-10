@@ -1,6 +1,7 @@
 <template>
   <div :class="$style.box">
-    <win-pic :pic="pic" width="200px" :text="text" />
+    <!-- <el-empty :description="text"></el-empty> -->
+    <el-empty description="描述文字"></el-empty>
   </div>
 </template>
 
@@ -8,15 +9,15 @@
 export default {
   name: 'PlaceHolder',
   props: {
-    pic: {
-      type: String,
-      default: 'no_information'
-    },
+    // pic: {
+    //   type: String,
+    //   default: 'no_information'
+    // },
     text: {
       type: String,
-      default: '数据为空...'
-    }
-  }
+      default: '数据为空...',
+    },
+  },
 }
 </script>
 
