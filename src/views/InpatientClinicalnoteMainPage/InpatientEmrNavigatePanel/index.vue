@@ -75,7 +75,7 @@ export default {
       justify-content: center;
       padding: 10px;
       .el-button {
-        width: 80%;
+        width: 50%;
       }
     }
   }

@@ -118,13 +118,14 @@
 
 <script>
 import MrtPreviewEditor from './components/MrtPreviewEditor.vue'
+import TemplateTree from './components/TemplateTree.vue'
 import {
   clinicalnoteTemplateClassTable,
   clinicalnoteTemplateTreeTestData,
 } from './aa'
 export default {
   name: '',
-  components: { MrtPreviewEditor },
+  components: { MrtPreviewEditor, TemplateTree },
   props: {
     emrCreateDialogData: { type: Object },
   },
@@ -137,7 +138,24 @@ export default {
       templateActive: '',
       tableLoading: false,
       activeName: '',
-      clinicalnoteTemplateTabs: [],
+      clinicalnoteTemplateTabs: [
+        {
+          label: '收藏',
+          name: 'first',
+        },
+        {
+          label: '全院',
+          name: 'second',
+        },
+        {
+          label: '科室',
+          name: 'third',
+        },
+        {
+          label: '我的',
+          name: 'four',
+        },
+      ],
       loading: false,
       //当前选中的病历模板
       selectedTemplateList: [],
@@ -179,23 +197,26 @@ export default {
       this.selectedTemplateList = []
       this.refreshByTab(tab.name)
     },
-    refreshByTab() {
-      // switch (tabName) {
-      // case 'first':
-      //   await this.getCollectClinicalnoteTemplateTree()
-      //   break
-      // case 'second':
-      this.getClinicalnoteTemplateTree('', 'second') //全院
-      // break
-      // case 'third':
-      //   await this.getMyClinicalnoteTemplateTree()
-      //   break
-      // case 'four':
-      //   await this.getOnlyMyClinicalnoteTemplateTree()
-      //   break
-      // default:
-      //   break
-      // }
+    refreshByTab(tabName) {
+      switch (tabName) {
+        case 'first':
+          this.clinicalnoteTemplateTree = []
+          // await this.getCollectClinicalnoteTemplateTree()
+          break
+        case 'second':
+          this.getClinicalnoteTemplateTree('', 'second') //全院
+          break
+        case 'third':
+          this.clinicalnoteTemplateTree = []
+          // await this.getMyClinicalnoteTemplateTree()
+          break
+        case 'four':
+          this.clinicalnoteTemplateTree = []
+          // await this.getOnlyMyClinicalnoteTemplateTree()
+          break
+        default:
+          break
+      }
     },
     async getClinicalnoteTemplateTree() {
       // this.activeRequestKey = activeRequestKey
@@ -233,6 +254,7 @@ export default {
 
       let data = this.clinicalnoteTemplateTreeTestData.data
       this.clinicalnoteTemplateTree = this.processClinicalnoteTemplateTree(data)
+      this.loading = false
       // }
     },
     processClinicalnoteTemplateTree(data = []) {
@@ -380,6 +402,15 @@ export default {
       }
     },
     handleCreateClinicalnote() {},
+    isCheckJurisdiction(data) {
+      let list = ['121383422926546946', '121383422926546945'] //病程、入院记录
+      if (list.includes(data.data.inpEmrClassId)) {
+        return this.selectedTemplateList.findIndex(
+          (el) => el.data.inpEmrClassId == data.data.inpEmrClassId
+        )
+      }
+      return -1
+    },
   },
 }
 </script>

@@ -33,7 +33,7 @@ import {
   // DataElementWinIds,
   DcEditorRenderModes,
 } from './constants'
-// import { cb2promise } from '@/utils/convertFunction'
+import { cb2promise } from '@/utils/convertFunction'
 import mixins from './mixins'
 import Editor from './editor'
 // import DiagnosisHelper from './helper/diagnosis_helper'
@@ -200,6 +200,33 @@ export default {
         } else {
           this.eventEmitter.$once(EditorEvent.PG_EVENT_PAGE_ONLOAD, resolve)
         }
+      })
+    },
+    async switchContentRenderMode(mode, oldMode) {
+      console.log('模式切换------', mode, oldMode)
+      //初始化需要设置成别的模式时，编辑器实例还没生成，设置不成功（短语管理）
+      const switchMode = (cb = () => {}) => {
+        this.eventEmitter.$once(EditorEvent.PG_EVENT_PAGE_ONLOAD, () => {
+          cb()
+        })
+        this.pgEditorInstance.postmessage({
+          type: mode,
+          param: [],
+        })
+
+        this.store.editor.mutations.setEditorContentRenderMode(mode)
+        // this.eventEmitter.$emit(
+        //   EditorEvent.EDITOR_CONTENT_RENDER_MODE_CHANGE,
+        //   mode
+        // )
+      }
+
+      if (!this.pgEditorInstance) {
+        await this.waitEditorLoaded()
+      }
+
+      await cb2promise((cb) => {
+        switchMode(cb)
       })
     },
     configDocument() {},

@@ -22,6 +22,7 @@
         />
       </el-tab-pane>
     </el-tabs>
+
     <place-holder v-else pic="no_information" text="请在左侧选择你要预览模板"></place-holder>
   </section>
 </template>
@@ -62,6 +63,7 @@ export default {
           return
         }
         this.activeName = this.mrtList[this.mrtList.length - 1].id
+
         for (let i = 0; i < this.mrtList.length; i++) {
           let el = this.mrtList[i]
           let _index = this.mrtPreviewList.findIndex((v) => v.id == el.id)
@@ -79,7 +81,8 @@ export default {
             if (!xml) return
             let item = this.mrtPreviewList.find((v) => v.id == el.id)
             item.xml = decompress(xml)
-
+            await Promise.resolve()
+            // debugger
             let pgEditor = this.$refs['pgEditorDom' + item.id][0]
             console.log(pgEditor, '加载模板内容')
             const load = (cb = () => {}) => {
@@ -122,10 +125,10 @@ export default {
             })
 
             //填充机构名和模板显示名称
-            await pgEditor.getPresetSystemConceptData()
-            let orgNameInfo = pgEditor.cachedPresetSystemConceptData.find(
-              (v) => v.conceptId == '399310029'
-            )
+            // await pgEditor.getPresetSystemConceptData()
+            // let orgNameInfo = pgEditor.cachedPresetSystemConceptData.find(
+            //   (v) => v.conceptId == '399310029'
+            // )
             pgEditor.pgEditorInstance.postmessage({
               type: 'SetValue',
               param: [
@@ -140,8 +143,8 @@ export default {
                 },
                 {
                   docId: '',
-                  conceptId: orgNameInfo?.conceptId,
-                  value: orgNameInfo?.dataValue,
+                  conceptId: '399310029',
+                  value: '啊啊啊',
                   type: 'normal',
                   valueType: 'text',
                   KeepTrace: false,
@@ -152,6 +155,7 @@ export default {
           }
         }
         //去掉之前加载的项
+
         this.mrtPreviewList = this.mrtPreviewList.filter((el) => {
           return this.mrtList.findIndex((item) => item.id == el.id) !== -1
         })

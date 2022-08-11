@@ -6,10 +6,18 @@ let mixin = {
       patientRootComponent: this,
     }
   },
+  props: {
+    particulars: {
+      type: Object,
+      default() {
+        return {}
+      },
+    },
+  },
   data() {
     return {
-      currentActiveLoadedClinicalnote: {},
-      loadedClinicalnoteList: [],
+      currentActiveLoadedClinicalnote: {}, //当前激活的病历信息
+      loadedClinicalnoteList: [], //加载的所有病历
       currentPatientInfo: null, //当前区域的患者信息
       eventHub: new Vue(),
     }
@@ -30,8 +38,7 @@ let mixin = {
   },
   mounted() {
     this.currentPatientInfo = {
-      bizRoleId: '',
-      encounterId: this.$router.currentRoute.meta.encounterId,
+      ...this.particulars,
     }
   },
   methods: {
