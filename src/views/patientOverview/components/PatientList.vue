@@ -38,7 +38,7 @@ export default {
       console.log('有患者')
       let dom = patientListItem[0]
 
-      this.setCurrentActiveLoadedPatient(this.patientList[0].encounterId)
+      this.addCachePatientList(this.patientList[0].encounterId)
       dom.click()
     }
   },
@@ -46,13 +46,13 @@ export default {
     ...patientInfoMapMutations([
       'addPatientList',
       'setCurrentActiveLoadedPatient',
+      'addCachePatientList',
     ]),
     addPatient() {
       this.addPatientList()
     },
     patientChange(item) {
-      this.setCurrentActiveLoadedPatient(item.encounterId)
-      this.$emit('patientChange', item)
+      this.addCachePatientList(item.encounterId)
     },
   },
 }

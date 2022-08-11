@@ -6,12 +6,15 @@
       </header>
       <section class="container-section">
         <div class="container-letft-patient-list">
-          <patient-list @patientChange="patientChange"></patient-list>
+          <patient-list></patient-list>
         </div>
         <div class="container-patient-content">
-          <keep-alive max="10">
-            <router-view :key="$route.fullPath" />
-          </keep-alive>
+          <InpatientClinicalnoteMainPage
+            v-for="item in cachePatientList"
+            :key="item.encounterId"
+            :particulars="item"
+            v-show="currentActiveLoadedPatient.encounterId==item.encounterId"
+          ></InpatientClinicalnoteMainPage>
         </div>
       </section>
     </div>
@@ -19,46 +22,27 @@
 </template>
 
 <script>
+import { createNamespacedHelpers } from 'vuex'
+const { mapState: patientInfoMapState, mapMutations: patientInfoMapMutations } =
+  createNamespacedHelpers('patientInfo')
 import HeaderPatientsDetails from './components/HeaderPatientsDetails'
 import PatientList from './components/PatientList'
+import InpatientClinicalnoteMainPage from '../InpatientClinicalnoteMainPage/index.vue'
 export default {
   name: 'patientOverview',
-  components: { HeaderPatientsDetails, PatientList },
+  components: {
+    HeaderPatientsDetails,
+    PatientList,
+    InpatientClinicalnoteMainPage,
+  },
   data() {
     return {}
   },
+  computed: {
+    ...patientInfoMapState(['cachePatientList', 'currentActiveLoadedPatient']),
+  },
   methods: {
-    patientChange(newPatient) {
-      let oldPathFlag = false //是否已经有了该路由
-      let skip = true //是否允许跳转
-
-      let encounterId = newPatient.encounterId
-      let newPath = '/patientOverview/' + encounterId
-      this.$router.getRoutes().forEach((item) => {
-        if (item.meta?.encounterId == encounterId) {
-          oldPathFlag = true
-        }
-        if (this.$route.meta?.encounterId == encounterId) {
-          skip = false
-        }
-      })
-      if (!skip) {
-        return
-      }
-      if (oldPathFlag) {
-        this.$router.push(newPath)
-        return
-      }
-
-      const routeObj = {
-        path: newPath,
-        name: '',
-        meta: { ...newPatient },
-        component: () => import('../InpatientClinicalnoteMainPage/index.vue'),
-      }
-      this.$router.addRoute('patientOverview', routeObj)
-      this.$router.push(newPath)
-    },
+    ...patientInfoMapMutations([]),
   },
 }
 </script>
