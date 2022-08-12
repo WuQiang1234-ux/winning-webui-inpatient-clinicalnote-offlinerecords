@@ -268,12 +268,6 @@ export default {
       }
     }, 500),
     DeleteLeave() {},
-    handleDeleteClinicalnote(data) {
-      data.loading = true
-      setTimeout(() => {
-        data.loading = false
-      }, 500)
-    },
   },
 }
 </script>

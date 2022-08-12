@@ -133,16 +133,26 @@ let mixin = {
       // 更换成编辑图标
       // this.NewAndChangedIcon()
     },
-
-    async handleDeleteClinicalnote(data1) {
-      data1.loading = true
-    },
-
     async deleteClinicalnote() {},
     hasInLoadedClinicalnoteList(id) {
       return this.patientRootComponent.loadedClinicalnoteList.find((v) => {
         return v.id == id
       })
+    },
+    async handleDeleteClinicalnote(data1) {
+      data1.loading = true
+      try {
+        if (this.deleteThePrompt) return
+        this.$confirm('此操作将永久删除该病历, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+        }).then(async () => {
+          console.log('删除', data1)
+        })
+      } finally {
+        data1.loading = false
+      }
     },
   },
 }
