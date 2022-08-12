@@ -7,6 +7,10 @@ export default {
         name: '患者1',
         encounterId: 1,
       },
+      {
+        name: '患者2',
+        encounterId: 2,
+      },
     ],
     cachePatientList: [], //缓存的患者列表
     currentActiveLoadedPatient: {}, //当前激活的患者

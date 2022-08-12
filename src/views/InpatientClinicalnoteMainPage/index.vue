@@ -19,6 +19,8 @@ import EditArea from './InpatientEmrEditArea/index.vue'
 import AuxiliaryInfo from './InpatientEmrAuxiliaryInfo/Index.vue'
 import multi_clinicalnote_board_state from './mixins/multi_clinicalnote_board_state'
 import emr from './mixins/emr'
+import { createNamespacedHelpers } from 'vuex'
+const { mapState: patientInfoMapState } = createNamespacedHelpers('patientInfo')
 export default {
   name: '',
   components: { NavigatePanel, EditArea, AuxiliaryInfo },
@@ -36,15 +38,10 @@ export default {
       isShowContent: false, //控制右边辅助区域是否显示内容
     }
   },
-  created() {
-    this.patientLoding = true
-  },
-  mounted() {
-    setTimeout(() => {
-      this.patientLoding = false
-    }, 200)
-  },
-  computed: {},
+  created() {},
+  mounted() {},
+  computed: { ...patientInfoMapState(['currentActiveLoadedPatient']) },
+
   watch: {
     isShowContent: {
       handler: function (v) {
@@ -62,6 +59,14 @@ export default {
       },
       deep: true,
       immediate: true,
+    },
+    currentActiveLoadedPatient: {
+      handler: function () {
+        this.patientLoding = true
+        setTimeout(() => {
+          this.patientLoding = false
+        }, 100)
+      },
     },
   },
   methods: {},
