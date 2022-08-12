@@ -1,5 +1,6 @@
 <template>
   <div v-show="store.toolbar.state.isShow" :class="classNames.editorToolbar">
+    <svg-icon icon-class="compile" font-size="14px" />22
     <el-tooltip
       popper-class="pg-editor-toolbar-tooltips"
       effect="light"
@@ -13,7 +14,7 @@
           }
         "
       >
-        <SymbolIcon icon-class="emr-icon-cancel" font-size="14px" />
+        <svg-icon icon-class="emr-icon-cancel" font-size="14px" />
       </el-button>
     </el-tooltip>
     <el-tooltip
@@ -29,7 +30,7 @@
           }
         "
       >
-        <SymbolIcon icon-class="emr-icon-recover" font-size="14px" />
+        <svg-icon icon-class="emr-icon-recover" font-size="14px" />
       </el-button>
     </el-tooltip>
     <span class="split-line"></span>
@@ -46,7 +47,7 @@
           }
         "
       >
-        <SymbolIcon icon-class="emr-icon-copy" font-size="14px" />
+        <svg-icon icon-class="emr-icon-copy" font-size="14px" />
       </el-button>
     </el-tooltip>
     <el-tooltip
@@ -62,7 +63,7 @@
           }
         "
       >
-        <SymbolIcon icon-class="emr-icon-cut" font-size="14px" />
+        <svg-icon icon-class="emr-icon-cut" font-size="14px" />
       </el-button>
     </el-tooltip>
     <span class="split-line"></span>
@@ -83,7 +84,7 @@
           }
         "
       >
-        <SymbolIcon icon-class="emr-icon-superscript" font-size="14px" />
+        <svg-icon icon-class="emr-icon-superscript" font-size="14px" />
       </el-button>
     </el-tooltip>
     <el-tooltip
@@ -103,7 +104,7 @@
           }
         "
       >
-        <SymbolIcon icon-class="emr-icon-subscript" font-size="14px" />
+        <svg-icon icon-class="emr-icon-subscript" font-size="14px" />
       </el-button>
     </el-tooltip>
     <span class="split-line"></span>
@@ -121,7 +122,7 @@
           }
         "
       >
-        <SymbolIcon icon-class="emr-icon-designformulas" font-size="14px" />
+        <svg-icon icon-class="emr-icon-designformulas" font-size="14px" />
       </el-button>
     </el-tooltip>
     <el-tooltip
@@ -138,7 +139,7 @@
           }
         "
       >
-        <SymbolIcon icon-class="emr-icon-spechars" font-size="14px" />
+        <svg-icon icon-class="emr-icon-spechars" font-size="14px" />
       </el-button>
     </el-tooltip>
     <span class="split-line"></span>
@@ -157,7 +158,7 @@
       >
         <WidgetTableCreator @submit="handleInsertTable" @cancel="handleCloseTableCreator" />
         <el-button slot="reference">
-          <SymbolIcon icon-class="emr-icon-insertform" font-size="14px" />
+          <svg-icon icon-class="emr-icon-insertform" font-size="14px" />
         </el-button>
       </el-popover>
     </el-tooltip>
@@ -172,7 +173,7 @@
         :disabled="!store.toolbar.state.isEmrSubmited"
         @click="handleEditorPrintAction"
       >
-        <SymbolIcon icon-class="emr-icon-print" font-size="14px" />
+        <svg-icon icon-class="emr-icon-print" font-size="14px" />
       </el-button>
     </el-tooltip>
     <el-tooltip
@@ -182,7 +183,7 @@
       placement="bottom"
     >
       <el-button :disabled="!store.toolbar.state.annotationStatus" @click="handleAnnotation">
-        <SymbolIcon icon-class="emr-icon-duanyu" font-size="14px" />
+        <svg-icon icon-class="emr-icon-duanyu" font-size="14px" />
       </el-button>
     </el-tooltip>
     <el-tooltip
@@ -215,7 +216,7 @@
           }"
           @click="contentRenderMode = store.toolbar.state.workModetype"
         >
-          <SymbolIcon icon-class="emr-icon-edit" font-size="14px" />
+          <svg-icon icon-class="emr-icon-edit" font-size="14px" />
         </el-button>
       </el-tooltip>
       <el-tooltip
@@ -230,7 +231,7 @@
           }"
           @click="contentRenderMode = dcEditorRenderModes.SET_PRINT_PREVIEW"
         >
-          <SymbolIcon icon-class="emr-icon-preview" font-size="14px" />
+          <svg-icon icon-class="emr-icon-preview" font-size="14px" />
         </el-button>
       </el-tooltip>
       <el-tooltip
@@ -249,7 +250,7 @@
             contentRenderMode = dcEditorRenderModes.SET_WORK_MODE_KEEP_TRACE
           "
         >
-          <SymbolIcon icon-class="emr-icon-mark" font-size="14px" />
+          <svg-icon icon-class="emr-icon-mark" font-size="14px" />
         </el-button>
       </el-tooltip>
     </template>
@@ -325,7 +326,7 @@
                 }
               "
             >
-              <SymbolIcon icon-class="emr-icon-bold" font-size="14px" />
+              <svg-icon icon-class="emr-icon-bold" font-size="14px" />
             </el-button>
           </el-tooltip>
           <el-tooltip
@@ -345,7 +346,7 @@
                 }
               "
             >
-              <SymbolIcon icon-class="emr-icon-underline" font-size="14px" />
+              <svg-icon icon-class="emr-icon-underline" font-size="14px" />
             </el-button>
           </el-tooltip>
 
@@ -365,7 +366,7 @@
                 }
               "
             >
-              <SymbolIcon icon-class="emr-icon-left" font-size="14px" />
+              <svg-icon icon-class="emr-icon-left" font-size="14px" />
             </el-button>
           </el-tooltip>
           <el-tooltip
@@ -384,7 +385,7 @@
                 }
               "
             >
-              <SymbolIcon icon-class="emr-icon-center" font-size="14px" />
+              <svg-icon icon-class="emr-icon-center" font-size="14px" />
             </el-button>
           </el-tooltip>
           <el-tooltip
@@ -403,7 +404,7 @@
                 }
               "
             >
-              <SymbolIcon icon-class="emr-icon-right" font-size="14px" />
+              <svg-icon icon-class="emr-icon-right" font-size="14px" />
             </el-button>
           </el-tooltip>
           <el-tooltip
@@ -422,7 +423,7 @@
                 }
               "
             >
-              <SymbolIcon icon-class="emr-icon-justify" font-size="14px" />
+              <svg-icon icon-class="emr-icon-justify" font-size="14px" />
             </el-button>
           </el-tooltip>
           <section class="scale-section">
@@ -443,7 +444,7 @@ import { throttle } from '@/utils/index'
 import mixins from './mixins'
 import {
   // getCurrentPatientInfo,
-  getPgEditorVm
+  getPgEditorVm,
 } from './utils'
 export default {
   name: 'EditorToolbar',
@@ -464,53 +465,34 @@ export default {
         '微软正黑体',
         '楷体',
         '新宋体',
-        '仿宋'
+        '仿宋',
       ],
       fontSizeOptionArr: [
-        10,
-        11,
-        12,
-        13,
-        14,
-        15,
-        16,
-        17,
-        18,
-        19,
-        20,
-        21,
-        22,
-        23,
-        24,
-        25,
-        26,
-        27,
-        28,
-        29,
-        30
+        10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27,
+        28, 29, 30,
       ],
       fontBoolObj: {
         SetSuperscript: false,
         SetSubscript: false,
         SetFontBold: false,
-        SetTextUnderline: false
-      }
+        SetTextUnderline: false,
+      },
     }
   },
   computed: {
     classNames() {
       return {
-        editorToolbar: `${this.classNamespace}-toolbar`
+        editorToolbar: `${this.classNamespace}-toolbar`,
       }
     },
     contentRenderMode: {
-      get: function() {
+      get: function () {
         return this.store.editor.state.editorOptions.ContentRenderMode
       },
-      set: function(v) {
+      set: function (v) {
         this.store.editor.mutations.setEditorContentRenderMode(v)
-      }
-    }
+      },
+    },
   },
   beforeDestroy() {
     this.removeEventBus()
@@ -544,11 +526,11 @@ export default {
     //点击文档过去默认字体
     setDefaultFontInfo(currentFont) {
       let { fontFamily, fontSize } = currentFont
-      let fontFamilyIndex = this.fontFamilyOptionArr.findIndex(v => {
+      let fontFamilyIndex = this.fontFamilyOptionArr.findIndex((v) => {
         return v == fontFamily
       })
 
-      let fontSizeIndex = this.fontSizeOptionArr.findIndex(v => {
+      let fontSizeIndex = this.fontSizeOptionArr.findIndex((v) => {
         return v == fontSize
       })
       //传过来的值不在可选范围内 则默认字体为微软雅黑  默认大小为14
@@ -563,9 +545,9 @@ export default {
         param: [
           {
             columnNumberString: colNum, //列数
-            lineNumberString: rowNum //行数
-          }
-        ]
+            lineNumberString: rowNum, //行数
+          },
+        ],
       })
       this.handleCloseTableCreator()
     },
@@ -575,10 +557,10 @@ export default {
     handleRefreshClinicalnote() {
       this.eventEmitter.$emit(EditorEvent.PG_EVENT_REFRESH_CLINICALNOTE)
     },
-    handleEditorPrintAction: throttle(function() {
+    handleEditorPrintAction: throttle(function () {
       const content = this.pgEditorVm.pgEditorInstance.postmessage({
         type: 'FileSave',
-        param: []
+        param: [],
       })[0].xml
       console.log('执行打印任务了 ------ ', content)
       this.eventEmitter.$emit(EditorEvent.PG_EVENT_PRINT_DOCUMENT, content)
@@ -589,7 +571,7 @@ export default {
     handleZoomOut() {
       this.pgEditorVm.pgEditorInstance.postmessage({
         type: 'ZoomOut',
-        param: ''
+        param: '',
       })
       this.scaleValue -= 10
       this.eventEmitter.$emit(EditorEvent.PG_EVENT_SCALE, this.scaleValue)
@@ -597,12 +579,12 @@ export default {
     handleZoomIn() {
       this.pgEditorVm.pgEditorInstance.postmessage({
         type: 'ZoomIn',
-        param: ''
+        param: '',
       })
       this.scaleValue += 10
       this.eventEmitter.$emit(EditorEvent.PG_EVENT_SCALE, this.scaleValue)
-    }
-  }
+    },
+  },
 }
 </script>
 

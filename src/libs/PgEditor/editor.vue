@@ -24,6 +24,7 @@ export default {
   name: 'Editor',
   components: { EditorToolbar },
   mixins: [mixins.getInjectMixin()],
+  inject: ['patientRootComponent'],
   props: {
     patientInfo: {
       type: Object,

@@ -8,6 +8,7 @@
     v-dialog-dragable
     @opened="handleDialogOpen"
     @close="handleDialogClose"
+    @change="handleSearchKeywordChange"
   >
     <template slot="title">
       <header>模板选择</header>
@@ -119,6 +120,12 @@
 <script>
 import MrtPreviewEditor from './components/MrtPreviewEditor.vue'
 import TemplateTree from './components/TemplateTree.vue'
+import { mapState } from 'vuex'
+import {
+  surgeryOrNot,
+  //  expertiseConceptId
+} from './utils'
+import dayjs from 'dayjs'
 import {
   clinicalnoteTemplateClassTable,
   clinicalnoteTemplateTreeTestData,
@@ -129,15 +136,16 @@ export default {
   props: {
     emrCreateDialogData: { type: Object },
   },
+  inject: ['patientRootComponent'],
   data() {
     return {
       isShow: true,
       clinicalnoteTemplateTree: [],
       clinicalnoteTemplateTreeTestData: clinicalnoteTemplateTreeTestData,
       searchKeyword: '',
-      templateActive: '',
+      templateActive: '121383422926546945',
       tableLoading: false,
-      activeName: '',
+      activeName: 'second',
       clinicalnoteTemplateTabs: [
         {
           label: '收藏',
@@ -164,6 +172,10 @@ export default {
     }
   },
   computed: {
+    ...mapState(['orgInfo']),
+    currentPatientInfo() {
+      return this.patientRootComponent.currentPatientInfo
+    },
     currentClinicalnoteTemplateClassDataId() {
       return this.selectedTemplateList.map((el) => el.keyId)
     },
@@ -185,9 +197,15 @@ export default {
     this.handleDialogOpen()
   },
   methods: {
-    handleSearchKeywordChange() {},
+    surgeryOrNot,
+    handleSearchKeywordChange() {
+      this.$nextTick(async () => {
+        await this.refreshByTab(this.activeName, { type: 'filter' })
+      })
+    },
     handleDialogOpen() {
       this.clinicalnoteTemplateTree = []
+      this.refreshByTab(this.activeName)
     },
     handleDialogClose() {
       this.emrCreateDialogData.isShow = false
@@ -197,14 +215,14 @@ export default {
       this.selectedTemplateList = []
       this.refreshByTab(tab.name)
     },
-    refreshByTab(tabName) {
+    refreshByTab(tabName, options) {
       switch (tabName) {
         case 'first':
           this.clinicalnoteTemplateTree = []
           // await this.getCollectClinicalnoteTemplateTree()
           break
         case 'second':
-          this.getClinicalnoteTemplateTree('', 'second') //全院
+          this.getClinicalnoteTemplateTree('second', options) //全院
           break
         case 'third':
           this.clinicalnoteTemplateTree = []
@@ -218,7 +236,7 @@ export default {
           break
       }
     },
-    async getClinicalnoteTemplateTree() {
+    async getClinicalnoteTemplateTree(tabName, options) {
       // this.activeRequestKey = activeRequestKey
       this.loading = true
       // let inpatEmrTypeId = ''
@@ -251,11 +269,41 @@ export default {
       //   if (this.activeRequestKey !== activeRequestKey)
       //     return Promise.reject('不处理历史请求')
       //   this.loading = false
+      let data = JSON.parse(
+        JSON.stringify(this.clinicalnoteTemplateTreeTestData.data)
+      )
 
-      let data = this.clinicalnoteTemplateTreeTestData.data
-      this.clinicalnoteTemplateTree = this.processClinicalnoteTemplateTree(data)
+      if (options?.type == 'filter') {
+        this.clinicalnoteTemplateTree = this.processClinicalnoteTemplateTree(
+          this.filterTemplate(data)
+        )
+      } else {
+        this.clinicalnoteTemplateTree =
+          this.processClinicalnoteTemplateTree(data)
+        console.log(this.filterTemplate(data), 2)
+      }
+
       this.loading = false
       // }
+    },
+    filterTemplate(data) {
+      if (!Array.isArray(data)) return []
+      for (let i = 0; i < data.length; i++) {
+        if (data[i]?.inpatMrtTemplate?.length) {
+          for (let j = 0; j < data[i]?.inpatMrtTemplate.length; j++) {
+            const item2 = data[j]?.inpatMrtTemplate[j]
+            if (!item2) continue
+            if (!item2.inpMrtDisplayname.includes(this.searchKeyword)) {
+              data[j].inpatMrtTemplate.splice(j, 1)
+              j--
+            }
+          }
+        }
+        if (data[i].nodes) {
+          data[i].nodes.forEach((item) => this.filterTemplate([item]))
+        }
+      }
+      return data
     },
     processClinicalnoteTemplateTree(data = []) {
       //去掉一级目录
@@ -316,14 +364,12 @@ export default {
     handleClinicalnoteTemplateClassTableClick(rowData, event) {
       console.log(rowData, event)
       if (rowData) {
-        this.overallSearchFlag = false //目录下搜索
         this.selectedTemplateList = []
         this.currentClinicalnoteTemplateClassData = {
           id: rowData.name,
           name: rowData.label,
         }
         console.log(this.currentClinicalnoteTemplateClassData)
-        this.setActivateTableRowStyle()
         this.refreshByTab(this.activeName)
       }
     },
@@ -360,48 +406,356 @@ export default {
         console.log('删除')
         this.selectedTemplateList.splice(dataIndex, 1)
       }
-      this.setActivateTableRowStyle()
     },
-    setActivateTableRowStyle() {
-      let activateTableRow =
-        this.$refs.clinicalnoteTemplateClassTable?.$el?.querySelectorAll(
-          '.el-table__row'
-        ) || []
-      console.log(activateTableRow, 999)
-      let activateLabelList = []
-      if (this.overallSearchFlag) {
-        this.clinicalnoteTemplateClassTable.forEach((el) => {
-          if (
-            this.selectedTemplateList.find(
-              (ele) => ele.data.inpEmrClassId == el.id
-            )
-          ) {
-            activateLabelList.push(el.name)
-          }
-        })
-        for (let val of activateTableRow) {
-          if (activateLabelList.includes(val.textContent)) {
-            val.classList.add('activateLabelListStyle')
+    filterClinicalnoteArr(clinicalnoteArr) {
+      let createdAt = dayjs().format('YYYY-MM-DD HH:mm:ss')
+      clinicalnoteArr.forEach((el) => {
+        el._displayname = el.data.inpMrtDisplayname || el.label
+        el.createdAt = createdAt
+        //399303379.个人 399303380.科室 399303381.全院"
+        el.mrtTypeCode = this.setMrtTypeCode(el)
+      })
+    },
+    setMrtTypeCode(nodeData) {
+      let mrtTypeCode = ''
+      if (this.activeName == 'second') {
+        mrtTypeCode = 399303381
+      }
+      if (this.activeName == 'third') {
+        mrtTypeCode = 399303380
+      }
+      if (nodeData.data.emrTemplatePersonalId) {
+        mrtTypeCode = 399303379
+        nodeData.data.inpatientMrtTypeId = nodeData.data.emrMrtMonitorId
+      }
+      return mrtTypeCode
+    },
+    async filterDisplayname(nodeData, displayname) {
+      if (nodeData.isDefineTitle) {
+        if (this.noteTaker === '') {
+          this.$message({
+            message: '请选择标题！',
+            type: 'warning',
+          })
+          this.isCreating = false
+          return Promise.reject()
+        }
+        const doctorName =
+          this.options.find((el) => el.employeeId == this.noteTaker)
+            ?.employeeName ?? ''
+        if (this.checked) {
+          if (this.doctorExpertise?.expertiseConceptId == '0') {
+            this.$message({
+              message: '未获取到职称',
+              type: 'warning',
+            })
+            return Promise.reject()
           } else {
-            val.classList.remove('activateLabelListStyle')
+            let _displayname = `${doctorName}${this.doctorExpertise?.expertiseName}代${displayname}`
+            return _displayname
           }
+        } else {
+          let _displayname = `${doctorName}${displayname}`
+          return _displayname
         }
       } else {
-        this.clinicalnoteTemplateClassTable.forEach((el) => {
-          if (this.currentClinicalnoteTemplateClassData?.id == el.id) {
-            activateLabelList.push(el.name)
-          }
+        return displayname
+      }
+    },
+    async parametVerify(clinicalnoteArr) {
+      if (!clinicalnoteArr.length) {
+        this.$message({
+          message: '请选择模板！',
+          type: 'warning',
         })
-        for (let val of activateTableRow) {
-          if (activateLabelList.includes(val.textContent)) {
-            val.classList.add('activateLabelListStyle')
-          } else {
-            val.classList.remove('activateLabelListStyle')
-          }
+        return Promise.reject()
+      }
+      console.log('this.doctorSAdviceFlag', this.doctorSAdviceFlag)
+
+      if (this.doctorSAdviceFlag) {
+        let flag = clinicalnoteArr.some(
+          (el) =>
+            this.surgeryOrNot(el.data.inpatientMrtTypeId) &&
+            el.data.inpEmrClassId == '121383422926546949'
+        )
+        if (flag && !this.operationValue.length) {
+          this.$message({
+            message: '请先下手术医嘱后再书写手术相关文书！',
+            type: 'warning',
+          })
+          return Promise.reject()
         }
       }
     },
-    handleCreateClinicalnote() {},
+    async handleCreateClinicalnote() {
+      try {
+        this.isCreating = true
+        let clinicalnoteArr = []
+        // if (this.templateTitleType == 'templateNormal') {
+        clinicalnoteArr = JSON.parse(JSON.stringify(this.selectedTemplateList))
+        //规则校验
+        await this.parametVerify(clinicalnoteArr)
+        //处理数据
+        await this.filterClinicalnoteArr(clinicalnoteArr)
+        console.log(this.currentClinicalnoteTemplateClassData)
+        //病程记录 处理连续病历
+        for (let i = 0; i < clinicalnoteArr.length; i++) {
+          if (clinicalnoteArr[i].data.inpEmrClassId == '121383422926546946') {
+            //处理标题 个人模板名称特殊处理
+            clinicalnoteArr[i]._displayname = await this.filterDisplayname(
+              clinicalnoteArr[i],
+              clinicalnoteArr[i].data.isPersonalTemplate
+                ? clinicalnoteArr[i].data.emrMrtName
+                : clinicalnoteArr[i]._displayname
+            )
+            //时间校验
+            clinicalnoteArr[i].createdAt = await this.createdAtVerify()
+          }
+        }
+        // } else {
+        //   clinicalnoteArr = JSON.parse(
+        //     JSON.stringify(this.selectedTemplateSetList)
+        //   )
+        //   //规则校验
+        //   await this.parametVerify(clinicalnoteArr)
+        //   //处理数据
+        //   clinicalnoteArr.forEach((el) => {
+        //     el._displayname = el.data.inpMrtDisplayname || el.label
+        //     el.mrtTypeCode = el.data.mrtTypeCode
+        //     el.createdAt = dayjs().format('YYYY-MM-DD HH:mm:ss')
+        //   })
+        // }
+
+        // if (this.isAudioHelp) {
+        //   this.isAudioHelp = false
+        // }
+
+        if (clinicalnoteArr.length > 1) {
+          //批量新增
+          await this.togetherToCreate(clinicalnoteArr)
+        } else {
+          await this.singleCreate(clinicalnoteArr)
+        }
+      } finally {
+        this.isCreating = false
+      }
+    },
+    processingParameter(clinicalnoteArr) {
+      return clinicalnoteArr.map((data) => ({
+        bizRoleId: this.currentPatientInfo.bizRoleId,
+        encounterId: this.currentPatientInfo.encounterId,
+        inpatEmrSetFileTime: data.createdAt,
+        createdAt: dayjs().format('YYYY-MM-DD HH:mm:ss'), //创建时间必须是当前时间
+        //只有病程的导航名称为显示名称 其他病历为模板名称
+        inpatEmrSetListTitle:
+          data.data.inpEmrClassId == '121383422926546946'
+            ? data._displayname
+            : data.label,
+        inpatEmrSetStatusCode: '960074',
+        inpatEmrSetTitle: data._displayname,
+        inpatEmrTypeId: data.data.inpEmrClassId,
+        inpatientMrtId: data.data.emrTemplatePersonalId
+          ? data.data.emrTemplatePersonalId
+          : data?.id,
+        mrtTypeCode: data.mrtTypeCode,
+
+        inpMrtMonitorId: data.data.inpatientMrtTypeId,
+        patientId: this.currentPatientInfo?.patientInfoOutput?.patientId ?? '',
+        inpatEmrSetId: '',
+        inpEmrDoctorId: this.noteTaker,
+        reviewedBy: '',
+        seqNo: '',
+        withdrawnBy: '',
+        encDeptId: this.orgInfo.orgId,
+        DeptName: this.orgInfo.orgName,
+      }))
+    },
+    async togetherToCreate(clinicalnoteArr) {
+      // let autoDialogClose = true
+      console.log('批量')
+      if (!clinicalnoteArr.length) {
+        return Promise.reject()
+      }
+      //如果是会诊的话就直接弹窗
+      clinicalnoteArr.forEach((item, i) => {
+        if (item.data.inpEmrClassId == '121383422926546950') {
+          clinicalnoteArr.splice(i, 1)
+          this.setConsultationCreatorVisibility({ flag: true })
+        }
+      })
+      //创建所有的病历
+      const inpEmrSetCreateList = this.processingParameter(clinicalnoteArr)
+      console.log(inpEmrSetCreateList, '一键创建请求参数')
+      // const {
+      //   data: {
+      //     returnMsgList = [],
+      //     inpEmrSetIdList = [],
+      //     deleteInpEmrSetList,
+      //     replaceConfirmFlag,
+      //     returnCode,
+      //     replaceAddInputList,
+      //     returnConfirmMsg
+      //   }
+      // } = await api
+      //   .batchSaveClinicalnote({
+      //     encounterId: this.currentPatientInfo.encounterId,
+      //     bizRoleId: this.currentPatientInfo.bizRoleId,
+      //     inpEmrSetCreateList
+      //   })
+      //   .catch(err => {
+      //     this.$store.commit('setHomeLoading', false)
+      //     console.log('createClinicalnoteListPromisesError', err)
+      //   })
+      // if (replaceConfirmFlag == '98175' && !returnCode) {
+      //   //要弹窗
+      //   let returnMsg = `${returnConfirmMsg}！`
+      //   console.log(this.selectedTemplateList, '过滤前1')
+      //   this.selectedTemplateList = this.selectedTemplateList.filter(item => {
+      //     return replaceAddInputList.some(
+      //       item2 => item2.inpatientMrtId == item.id
+      //     )
+      //   })
+      //   console.log(this.selectedTemplateList, '过滤后1')
+      //   this.deleteConfirm(deleteInpEmrSetList, returnMsg, 'batch')
+      //   autoDialogClose = false
+      //   // return Promise.reject()
+      // }
+      // if (returnMsgList.length) {
+      //   returnMsgList.forEach(el => {
+      //     setTimeout(() => {
+      //       this.$message.warning(el)
+      //     })
+      //   })
+      //   console.log(clinicalnoteArr, '----------', returnMsgList)
+      //   if (clinicalnoteArr.length == returnMsgList.length)
+      //     return Promise.reject()
+      // }
+      // console.log('创建后的', inpEmrSetIdList)
+      // await this.updateDocStatusAfterCreated(inpEmrSetIdList)
+      //手术逻辑
+      // await this.surgery(inpEmrSetIdList)
+      //刷新待书写列表
+      // this.$root.eventHub.$emit('clinicalnote/refreshIncompleteDocList')
+      // if (this.activateMenu == 'emr_tree') {
+      // if (inpEmrSetIdList.length == 1) {
+      //   console.log(clinicalnoteArr[0])
+      //   //重新获取树结构
+      //   this.$root.eventHub.$emit('clinicalnote/refreshTreeData', {
+      //     inpatEmrTypeId: clinicalnoteArr[0].data.inpEmrClassId,
+      //     inpatEmrSetId: emrSetId
+      //   })
+      // } else {
+      //重新获取树结构
+      // this.$root.eventHub.$emit('clinicalnote/refreshTreeData', {
+      //   inpatEmrTypeId: clinicalnoteArr[0].data.inpEmrClassId
+      // })
+      // }
+      // } else {
+      // //重新获取时间轴数据
+      // if (inpEmrSetIdList.length == 1) {
+      //   this.$root.eventHub.$emit(
+      //     'clinicalnote/refreshTimeLineData',
+      //     emrSetId
+      //   )
+      // } else {
+      // this.$root.eventHub.$emit('clinicalnote/refreshTimeLineData')
+      // }
+      // }
+
+      // autoDialogClose && this.handleDialogClose()
+    },
+    async singleCreate(clinicalnoteArr) {
+      console.log('单个')
+      //创建病历前需要规则校验
+      // let res = await api.clinicalnoteTouchAction({
+      //   touchActionCode: '399542625',
+      //   encounterId: this.currentPatientInfo.encounterId,
+      //   inpEmrClassId: clinicalnoteArr[0].data.inpEmrClassId,
+      //   inpMrtMonitorId: clinicalnoteArr[0].data.inpatientMrtTypeId
+      // })
+      // if (!res.success) {
+      //   this.isCreating = false
+      //   return Promise.reject()
+      // }
+      // if (res.data.replaceConfirmFlag == '98175' && !res.data.resultFlag) {
+      //   this.deleteConfirm(
+      //     [res.data.deleteInpEmrSet],
+      //     res.data.returnMsg,
+      //     'odd'
+      //   )
+      //   this.isCreating = false
+      //   return Promise.reject()
+      // }
+
+      // if (res.data.replaceConfirmFlag == '98176' && !res.data.resultFlag) {
+      //   this.$message.warning(res.data.returnMsg)
+      //   this.isCreating = false
+      //   return Promise.reject()
+      // }
+      // //如果是会诊的话就直接弹窗
+      // if (clinicalnoteArr[0].data.inpEmrClassId == '121383422926546950') {
+      //   this.handleDialogClose()
+      //   this.setConsultationCreatorVisibility({ flag: true })
+      // } else {
+      //创建单个病历
+      const inpEmrSetCreateList = this.processingParameter(clinicalnoteArr)
+      console.log(inpEmrSetCreateList[0], '请求参数')
+      //   let res2 = await api.createClinicalnote(inpEmrSetCreateList[0])
+
+      //   this.setNearestCreatedEmrId(res2?.data?.inpatEmrSetId)
+
+      //   clinicalnoteArr[0].inpatEmrSetId = res2?.data?.inpatEmrSetId
+      //   clinicalnoteArr[0].inpMrtMonitorId = res2?.data?.inpMrtMonitorId
+      //   await this.updateDocStatusAfterCreated(clinicalnoteArr)
+
+      //   this.isCreating = false
+      //   //手术逻辑
+      //   const { data } = res2
+      //   await this.surgery([data])
+      //   if (data?.emrSetId) {
+      //     //刷新待书写列表
+      //     this.$root.eventHub.$emit('clinicalnote/refreshIncompleteDocList')
+      //     //创建完病历刷新病历菜单
+      //     if (this.activateMenu === 'emr_list') {
+      //       this.$root.eventHub.$emit(
+      //         'clinicalnote/refreshTimeLineData',
+      //         data.emrSetId
+      //       )
+      //     } else {
+      //       this.$root.eventHub.$emit('clinicalnote/refreshTreeData', {
+      //         inpatEmrTypeId: clinicalnoteArr[0].data.inpEmrClassId,
+      //         inpatEmrSetId: data.emrSetId
+      //       })
+      //     }
+      //     this.handleDialogClose()
+      //   } else {
+      //     this.$message({
+      //       message: data.commonOutputInfo.returnMsg,
+      //       type: 'warning'
+      //     })
+      //   }
+      // }
+    },
+    async createdAtVerify() {
+      //时间校验 this.recordDate
+      let ryDateTime = new Date(
+        this.currentPatientInfo?.admittedToWardAt
+      ).getTime()
+      let nowvalue = (
+        this.recordDate instanceof Date
+          ? this.recordDate
+          : new Date(this.recordDate)
+      ).getTime()
+      if (ryDateTime > nowvalue) {
+        this.$message({
+          message: '病程记录时间不能早于入院时间',
+          type: 'warning',
+        })
+        this.isCreating = false
+        return Promise.reject()
+      }
+      return dayjs(this.recordDate).format('YYYY-MM-DD HH:mm:ss')
+    },
     isCheckJurisdiction(data) {
       let list = ['121383422926546946', '121383422926546945'] //病程、入院记录
       if (list.includes(data.data.inpEmrClassId)) {
