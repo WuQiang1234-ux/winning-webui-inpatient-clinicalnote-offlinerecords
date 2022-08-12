@@ -18,11 +18,17 @@ import NavigatePanel from './InpatientEmrNavigatePanel/index.vue'
 import EditArea from './InpatientEmrEditArea/index.vue'
 import AuxiliaryInfo from './InpatientEmrAuxiliaryInfo/Index.vue'
 import multi_clinicalnote_board_state from './mixins/multi_clinicalnote_board_state'
+import emr from './mixins/emr'
 export default {
   name: '',
   components: { NavigatePanel, EditArea, AuxiliaryInfo },
   props: {},
-  mixins: [multi_clinicalnote_board_state],
+  provide() {
+    return {
+      patientRootComponent: this,
+    }
+  },
+  mixins: [multi_clinicalnote_board_state, emr],
   data() {
     return {
       patientLoding: false,

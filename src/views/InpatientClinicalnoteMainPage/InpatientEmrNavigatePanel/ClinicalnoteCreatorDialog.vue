@@ -21,7 +21,7 @@
             placeholder="请输入搜索内容"
             suffix-icon="el-icon-search"
             clearable
-            @change="handleSearchKeywordChange"
+            @input="handleSearchKeywordChange"
           ></el-input>
         </div>
         <div class="searchForDetails">
@@ -205,6 +205,11 @@ export default {
     },
     handleDialogOpen() {
       this.clinicalnoteTemplateTree = []
+      if (this.emrCreateDialogData?.data?.defaultTemplateClassId) {
+        this.templateActive =
+          this.emrCreateDialogData.data.defaultTemplateClassId
+      }
+
       this.refreshByTab(this.activeName)
     },
     handleDialogClose() {

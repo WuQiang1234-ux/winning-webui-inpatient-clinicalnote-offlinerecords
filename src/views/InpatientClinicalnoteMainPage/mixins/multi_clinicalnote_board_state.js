@@ -1,11 +1,6 @@
 import { ClinicalnoteTypes } from '@/components/MultiClinicalnoteBoard'
 import Vue from 'vue'
 let mixin = {
-  provide() {
-    return {
-      patientRootComponent: this,
-    }
-  },
   props: {
     particulars: {
       type: Object,

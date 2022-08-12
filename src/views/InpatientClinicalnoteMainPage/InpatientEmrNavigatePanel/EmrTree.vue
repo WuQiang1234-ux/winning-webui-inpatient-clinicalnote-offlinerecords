@@ -30,6 +30,64 @@
               >{{ data.rawData.inpatEmrSetListTitle }}</span>
             </el-tooltip>
           </div>
+          <template v-if="data.isRoot">
+            <span v-if="isShowAddButton" class="node-actions">
+              <el-button
+                class="node-action add-action"
+                type="text"
+                icon="el-icon-plus"
+                @click.stop.prevent="
+                  () => {
+                    handleAddClinicalnote(data)
+                  }
+                "
+              ></el-button>
+            </span>
+          </template>
+          <template v-else>
+            <!-- 会诊和已封存、已打印的病历不展示删除按钮 -->
+            <span
+              v-if="
+                data.emrTypeId !== '121383422926546950' &&
+                  data.rawData.inpEmrDisplayStatusCode !== '399572897' &&
+                  data.rawData.inpEmrDisplayStatusCode !== '399572894'
+              "
+              class="node-actions"
+              @mouseleave="DeleteLeave"
+            >
+              <el-tooltip
+                v-if="deleteThePrompt"
+                effect="dark"
+                :content="deleteThePrompt"
+                placement="right"
+                :enterable="false"
+              >
+                <el-button
+                  class="node-action delete-action"
+                  type="text"
+                  icon="el-icon-delete"
+                  :loading="data.loading"
+                  @click.stop.prevent="
+                    () => {
+                      handleDeleteClinicalnote(data)
+                    }
+                  "
+                ></el-button>
+              </el-tooltip>
+              <el-button
+                v-else
+                class="node-action delete-action"
+                type="text"
+                icon="el-icon-delete"
+                :loading="data.loading"
+                @click.stop.prevent="
+                  () => {
+                    handleDeleteClinicalnote(data)
+                  }
+                "
+              ></el-button>
+            </span>
+          </template>
         </span>
       </template>
     </el-tree>
@@ -48,11 +106,14 @@ export default {
   mixins: [mixin],
   components: {},
   props: {},
+  inject: ['patientRootComponent'],
   data() {
     return {
       treeLoading: false,
       clinicalnoteTreeData: [],
       treeDefaultExpandedKeys: [], //树展开的目录id
+      deleteThePrompt: false,
+      isShowAddButton: true,
     }
   },
   computed: {},
@@ -71,6 +132,11 @@ export default {
     this.eventHubHelper.destroy()
   },
   methods: {
+    handleAddClinicalnote(data) {
+      this.patientRootComponent.showEmrCreateDialog({
+        defaultTemplateClassId: data.rawData.inpatientEmrTypeId,
+      })
+    },
     setClinicalnoteTreeData() {
       this.clinicalnoteTreeData = this.filterClinicalnoteTreeData(treeData.data)
       console.log(this.clinicalnoteTreeData, 'this.clinicalnoteTreeData ')
@@ -201,6 +267,13 @@ export default {
         this.openDoctorReadingList(data, params)
       }
     }, 500),
+    DeleteLeave() {},
+    handleDeleteClinicalnote(data) {
+      data.loading = true
+      setTimeout(() => {
+        data.loading = false
+      }, 500)
+    },
   },
 }
 </script>
