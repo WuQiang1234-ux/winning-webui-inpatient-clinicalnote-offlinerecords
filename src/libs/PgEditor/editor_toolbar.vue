@@ -1,6 +1,5 @@
 <template>
   <div v-show="store.toolbar.state.isShow" :class="classNames.editorToolbar">
-    <svg-icon icon-class="compile" font-size="14px" />22
     <el-tooltip
       popper-class="pg-editor-toolbar-tooltips"
       effect="light"
@@ -14,7 +13,7 @@
           }
         "
       >
-        <svg-icon icon-class="emr-icon-cancel" font-size="14px" />
+        <i class="emr-icon-cancel"></i>
       </el-button>
     </el-tooltip>
     <el-tooltip
@@ -30,7 +29,7 @@
           }
         "
       >
-        <svg-icon icon-class="emr-icon-recover" font-size="14px" />
+        <i class="emr-icon-recover"></i>
       </el-button>
     </el-tooltip>
     <span class="split-line"></span>
@@ -47,7 +46,7 @@
           }
         "
       >
-        <svg-icon icon-class="emr-icon-copy" font-size="14px" />
+        <i class="emr-icon-copy"></i>
       </el-button>
     </el-tooltip>
     <el-tooltip
@@ -63,7 +62,7 @@
           }
         "
       >
-        <svg-icon icon-class="emr-icon-cut" font-size="14px" />
+        <i class="emr-icon-cut"></i>
       </el-button>
     </el-tooltip>
     <span class="split-line"></span>
@@ -84,7 +83,7 @@
           }
         "
       >
-        <svg-icon icon-class="emr-icon-superscript" font-size="14px" />
+        <i class="emr-icon-superscript"></i>
       </el-button>
     </el-tooltip>
     <el-tooltip
@@ -104,7 +103,7 @@
           }
         "
       >
-        <svg-icon icon-class="emr-icon-subscript" font-size="14px" />
+        <i class="emr-icon-subscript"></i>
       </el-button>
     </el-tooltip>
     <span class="split-line"></span>
@@ -122,7 +121,7 @@
           }
         "
       >
-        <svg-icon icon-class="emr-icon-designformulas" font-size="14px" />
+        <i class="emr-icon-designformulas"></i>
       </el-button>
     </el-tooltip>
     <el-tooltip
@@ -139,7 +138,7 @@
           }
         "
       >
-        <svg-icon icon-class="emr-icon-spechars" font-size="14px" />
+        <i class="emr-icon-spechars"></i>
       </el-button>
     </el-tooltip>
     <span class="split-line"></span>
@@ -158,7 +157,7 @@
       >
         <WidgetTableCreator @submit="handleInsertTable" @cancel="handleCloseTableCreator" />
         <el-button slot="reference">
-          <svg-icon icon-class="emr-icon-insertform" font-size="14px" />
+          <i class="emr-icon-insertform"></i>
         </el-button>
       </el-popover>
     </el-tooltip>
@@ -173,7 +172,7 @@
         :disabled="!store.toolbar.state.isEmrSubmited"
         @click="handleEditorPrintAction"
       >
-        <svg-icon icon-class="emr-icon-print" font-size="14px" />
+        <i class="emr-icon-print"></i>
       </el-button>
     </el-tooltip>
     <el-tooltip
@@ -183,7 +182,7 @@
       placement="bottom"
     >
       <el-button :disabled="!store.toolbar.state.annotationStatus" @click="handleAnnotation">
-        <svg-icon icon-class="emr-icon-duanyu" font-size="14px" />
+        <i class="emr-icon-duanyu"></i>
       </el-button>
     </el-tooltip>
     <el-tooltip
@@ -216,7 +215,7 @@
           }"
           @click="contentRenderMode = store.toolbar.state.workModetype"
         >
-          <svg-icon icon-class="emr-icon-edit" font-size="14px" />
+          <i class="emr-icon-edit"></i>
         </el-button>
       </el-tooltip>
       <el-tooltip
@@ -231,7 +230,7 @@
           }"
           @click="contentRenderMode = dcEditorRenderModes.SET_PRINT_PREVIEW"
         >
-          <svg-icon icon-class="emr-icon-preview" font-size="14px" />
+          <i class="emr-icon-preview"></i>
         </el-button>
       </el-tooltip>
       <el-tooltip
@@ -250,7 +249,7 @@
             contentRenderMode = dcEditorRenderModes.SET_WORK_MODE_KEEP_TRACE
           "
         >
-          <svg-icon icon-class="emr-icon-mark" font-size="14px" />
+          <i class="emr-icon-mark"></i>
         </el-button>
       </el-tooltip>
     </template>
@@ -326,7 +325,7 @@
                 }
               "
             >
-              <svg-icon icon-class="emr-icon-bold" font-size="14px" />
+              <i class="emr-icon-bold"></i>
             </el-button>
           </el-tooltip>
           <el-tooltip
@@ -346,7 +345,7 @@
                 }
               "
             >
-              <svg-icon icon-class="emr-icon-underline" font-size="14px" />
+              <i class="emr-icon-underline"></i>
             </el-button>
           </el-tooltip>
 
@@ -366,7 +365,7 @@
                 }
               "
             >
-              <svg-icon icon-class="emr-icon-left" font-size="14px" />
+              <i class="emr-icon-left"></i>
             </el-button>
           </el-tooltip>
           <el-tooltip
@@ -385,7 +384,7 @@
                 }
               "
             >
-              <svg-icon icon-class="emr-icon-center" font-size="14px" />
+              <i class="emr-icon-center"></i>
             </el-button>
           </el-tooltip>
           <el-tooltip
@@ -404,7 +403,7 @@
                 }
               "
             >
-              <svg-icon icon-class="emr-icon-right" font-size="14px" />
+              <i class="emr-icon-right"></i>
             </el-button>
           </el-tooltip>
           <el-tooltip
@@ -423,7 +422,7 @@
                 }
               "
             >
-              <svg-icon icon-class="emr-icon-justify" font-size="14px" />
+              <i class="emr-icon-justify"></i>
             </el-button>
           </el-tooltip>
           <section class="scale-section">
@@ -611,7 +610,7 @@ $classNamespace: 'pg-editor';
     font-size: 14px;
     border: none;
     border-radius: 2px;
-    margin: 0 5px;
+    margin: 0;
     &:hover {
       color: var(--COLOR-HOVER);
     }
