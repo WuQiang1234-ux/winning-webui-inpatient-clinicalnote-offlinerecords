@@ -1,25 +1,19 @@
 <template>
-  <div :key="auxiliaryInfoKey" class="inpatient-emr-auxiliary-info-wrap">
-    <div class="inpatient-emr-auxiliary-info">
-      <i
-        v-if="isShowContent && tabPosition == 'right'"
-        class="el-icon-close"
-        @click="handleIconClose"
-      ></i>
-      <el-tabs
-        v-model="activeName"
-        class="auxiliary-info-tab"
-        :tab-position="tabPosition"
-        @tab-click="handleTabClick"
-      >
-        <template v-for="el in tabPaneList">
-          <el-tab-pane :key="el.code" :label="el.label" :name="el.name">
-            <!-- 生命体征 -->
-            <nursing-info v-if="activeName === el.name && el.code == '399574003'"></nursing-info>
-          </el-tab-pane>
-        </template>
-      </el-tabs>
-    </div>
+  <div :key="auxiliaryInfoKey" class="inpatient-emr-auxiliary-info">
+    <!-- <i class="el-icon-close" @click="handleIconClose"></i> -->
+    <el-tabs
+      v-model="activeName"
+      class="auxiliary-info-tab"
+      tab-position="left"
+      @tab-click="handleTabClick"
+    >
+      <template v-for="el in tabPaneList">
+        <el-tab-pane :key="el.code" :label="el.label" :name="el.name">
+          <!-- 生命体征 -->
+          <nursing-info v-if="activeName === el.name && el.code == '399574003'"></nursing-info>
+        </el-tab-pane>
+      </template>
+    </el-tabs>
   </div>
 </template>
 
@@ -33,10 +27,6 @@ export default {
     NursingInfo,
   },
   props: {
-    tabPosition: {
-      type: String,
-      default: 'left',
-    },
     isShowContent: {
       type: Boolean,
       default: true,
@@ -49,7 +39,7 @@ export default {
   },
   data() {
     return {
-      activeName: 'inputAssistant',
+      activeName: 'nursingInfo',
       auxiliaryInfoKey: +new Date(),
       tabPaneList: [
         {
@@ -62,13 +52,6 @@ export default {
   },
   computed: {},
   watch: {
-    tabPosition: {
-      handler: function (v) {
-        v == 'left' && this.setIsShowContent(true)
-      },
-      deep: true,
-      immediate: true,
-    },
     // isShowContent: {
     //   handler: function (v) {
     //     if (v) {
@@ -90,82 +73,41 @@ export default {
     },
   },
   async created() {},
-  mounted() {
-    // this.registerEventBus()
-  },
-  beforeDestroy() {
-    // this.removeEventBus()
-  },
+  mounted() {},
+  beforeDestroy() {},
   methods: {
-    // ...clinicalnoteMapActions(['getPersonalSetting']),
-    // setIsShowContent(e) {
-    //   this.$emit('setIsShowContent', e)
-    // },
-    // registerEventBus() {
-    //   //短语收藏、引用和病案质控需要定位辅助区域Tab
-    //   this.$root.eventHub.$on(
-    //     'AuxiliaryInfo/SetActiveTab',
-    //     this.handleEventActiveTab
-    //   )
-    //   this.$root.eventHub.$on(
-    //     'clinicalnote/openInspectReportByAudio',
-    //     this.openInspectReportByAudio
-    //   )
-
-    //   this.$root.eventHub.$on(
-    //     'clinicalnote/openQualityRemindPoll',
-    //     this.pollFetch
-    //   )
-    // },
-    removeEventBus() {
-      // this.$root.eventHub.$off(
-      //   'clinicalnote/openInspectReportByAudio',
-      //   this.openInspectReportByAudio
-      // )
-      // this.$root.eventHub.$off(
-      //   'AuxiliaryInfo/SetActiveTab',
-      //   this.handleEventActiveTab
-      // )
-      // this.$root.eventHub.$off(
-      //   'clinicalnote/openQualityRemindPoll',
-      //   this.pollFetch
-      // )
-    },
+    removeEventBus() {},
     handleEventActiveTab(val) {
       if (this.activeName !== val) {
         this.activeName = val
       }
     },
-    handleIconClose() {
-      //关闭重置所有状态
-      this.auxiliaryInfoKey = +new Date()
-      this.setIsShowContent(false)
-    },
+    // handleIconClose() {
+    //   //关闭重置所有状态
+    //   this.auxiliaryInfoKey = +new Date()
+    // },
     handleTabClick() {},
   },
 }
 </script>
 
 <style lang="scss" scoped>
-.inpatient-emr-auxiliary-info-wrap {
+.inpatient-emr-auxiliary-info {
+  position: relative;
   width: 100%;
   height: 100%;
   box-sizing: border-box;
   background-color: #fff;
   overflow: hidden;
   border-left: 1px solid #c9c9c9;
-  .inpatient-emr-auxiliary-info {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    .el-icon-close {
-      position: absolute;
-      right: 72px;
-      top: 14px;
-      font-size: 18px;
-      color: #7a85a1;
-      z-index: 999;
-    }
+
+  .el-icon-close {
+    position: absolute;
+    right: 15px;
+    top: 14px;
+    font-size: 18px;
+    color: #7a85a1;
+    z-index: 999;
   }
 }
 

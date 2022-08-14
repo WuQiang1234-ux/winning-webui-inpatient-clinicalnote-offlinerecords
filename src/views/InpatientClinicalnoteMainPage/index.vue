@@ -1,13 +1,34 @@
 <template>
-  <div class="inpatient-emr-index-wrap" element-loading-text="加载中" v-loading="patientLoding">
-    <navigate-panel></navigate-panel>
+  <div
+    ref="inpatientMainPage"
+    class="inpatient-emr-index-wrap"
+    element-loading-text="加载中"
+    v-loading="patientLoding"
+    :class="{ isShowContent }"
+  >
+    <div class="toggleHandler" :class="{ pullLeft: isHidden }" @click="isHidden = !isHidden">
+      <i v-if="isHidden" class="el-icon-d-arrow-right"></i>
+      <i v-else class="el-icon-d-arrow-left"></i>
+    </div>
+    <navigate-panel v-if="!isHidden"></navigate-panel>
     <edit-area class="inpatient-emr-editor"></edit-area>
-    <AuxiliaryInfo
-      class="auxiliary"
-      :tabPosition="tabPosition"
-      :isShowContent="isShowContent"
-      @setIsShowContent="isShowContent = $event"
-    />
+    <div class="resizeHandlerBg"></div>
+    <div class="inpatient-emr-auxiliary">
+      <div class="resizeHandler"></div>
+      <div
+        class="rightToggleHandler"
+        :class="{ pullRight: isHiddenRight }"
+        @click="handleRightToggleHandler"
+      >
+        <i v-if="isHiddenRight" class="el-icon-d-arrow-left"></i>
+        <i v-else class="el-icon-d-arrow-right"></i>
+      </div>
+      <AuxiliaryInfo
+        class="auxiliary"
+        :isShowContent="isShowContent"
+        @setIsShowContent="isShowContent = $event"
+      />
+    </div>
   </div>
 </template>
 
@@ -34,12 +55,24 @@ export default {
   data() {
     return {
       patientLoding: false,
-      tabPosition: 'right', //控制右边辅助区域切换栏位置
       isShowContent: false, //控制右边辅助区域是否显示内容
+      isHidden: false, //是否隐藏左侧
+      isHiddenRight: true, //是否隐藏右侧
     }
   },
   created() {},
-  mounted() {},
+  mounted() {
+    //1920及以下宽度右侧拖拽改变宽度
+    this.dragControllerDiv()
+    //浏览器宽度变化监听
+    this.autoSetLayout()
+    window.addEventListener('resize', this.autoSetLayout, false)
+    this.registerEventBus()
+  },
+  beforeDestroy() {
+    window.addEventListener('resize', null, false)
+    this.removeEventBus()
+  },
   computed: { ...patientInfoMapState(['currentActiveLoadedPatient']) },
 
   watch: {
@@ -69,11 +102,66 @@ export default {
       },
     },
   },
-  methods: {},
+  methods: {
+    registerEventBus() {
+      //短语收藏、引用和病案质控需要定位辅助区域Tab
+      this.$root.eventHub.$on(
+        'AuxiliaryInfo/ShowContentArea',
+        this.eventOpenAuxiliaryInfo
+      )
+    },
+    removeEventBus() {
+      this.$root.eventHub.$off(
+        'AuxiliaryInfo/ShowContentArea',
+        this.eventOpenAuxiliaryInfo
+      )
+    },
+    eventOpenAuxiliaryInfo() {
+      this.isShowContent = true
+    },
+    autoSetLayout() {
+      let edge = window.winning ? 1694 : 1680
+      if (document.documentElement.clientWidth > edge) {
+        this.isShowContent = true
+        $('.resizeHandler').show()
+      } else {
+        $('.resizeHandler').hide()
+      }
+    },
+    dragControllerDiv() {
+      let _box = this.$refs['inpatientMainPage']
+      var auxiliaryBox = _box.getElementsByClassName(
+        'inpatient-emr-auxiliary'
+      )[0]
+      var resizeHandler = _box.getElementsByClassName('resizeHandler')[0]
+      var resizeHandlerBg = _box.getElementsByClassName('resizeHandlerBg')[0]
+      resizeHandler.onmousedown = (e) => {
+        var startX = e.clientX
+        let oldWidth = $(auxiliaryBox).width()
+        $(resizeHandlerBg).css('display', 'block')
+        document.onmousemove = function (e) {
+          var endX = e.clientX
+          $(auxiliaryBox).width(oldWidth + (startX - endX))
+        }
+        document.onmouseup = function () {
+          document.onmousemove = null
+          document.onmouseup = null
+
+          $(resizeHandlerBg).css('display', 'none')
+          resizeHandler.releaseCapture && resizeHandler.releaseCapture()
+        }
+        resizeHandler.setCapture && resizeHandler.setCapture()
+        return false
+      }
+    },
+    handleRightToggleHandler() {
+      this.isShowContent = !this.isShowContent
+    },
+  },
 }
 </script>
 
-<style lang='scss' scoped >
+<style lang="scss" scoped>
 .inpatient-emr-index-wrap {
   position: relative;
   display: flex;
@@ -104,7 +192,7 @@ export default {
 .toggleHandler {
   display: block;
   position: absolute;
-  left: 278px;
+  left: 300px;
   top: 50%;
   margin-top: -44px;
   width: 20px;
@@ -179,41 +267,5 @@ export default {
   z-index: 10;
   border-top-right-radius: 4px;
   border-bottom-right-radius: 4px;
-}
-@media screen and (min-width: 1921px) {
-  .inpatient-emr-navigation {
-    width: 540px;
-  }
-  .toggleHandler {
-    display: none;
-  }
-}
-
-@media screen and (max-width: 1680px) {
-  //窄屏展示右侧内容区域时样式变更
-  .inpatient-emr-index-wrap.isShowContent {
-    .inpatient-emr-auxiliary {
-      width: 540px;
-      min-width: 540px;
-    }
-  }
-
-  .rightToggleHandler {
-    display: block;
-  }
-
-  .inpatient-emr-index-wrap {
-    padding-right: 60px;
-  }
-  .inpatient-emr-auxiliary {
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 60px;
-    min-width: 60px;
-    height: 100%;
-    max-width: 50vw;
-    flex: none;
-  }
 }
 </style>

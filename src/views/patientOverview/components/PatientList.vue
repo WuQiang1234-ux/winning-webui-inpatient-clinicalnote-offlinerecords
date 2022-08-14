@@ -10,7 +10,7 @@
       >{{item.name}}</li>
     </ul>
     <div class="patient-list-add">
-      <el-button type="primary" @click="addPatient">新增患者</el-button>
+      <el-button type="primary" size="small" @click="addPatient">新增患者</el-button>
     </div>
   </div>
 </template>
@@ -62,7 +62,7 @@ export default {
 .patient {
   height: 100%;
   position: relative;
-  border-right: 1px solid #ccc;
+  border-right: 1px solid #c8d0e8;
   .patient-list {
     height: 100%;
     width: 100%;

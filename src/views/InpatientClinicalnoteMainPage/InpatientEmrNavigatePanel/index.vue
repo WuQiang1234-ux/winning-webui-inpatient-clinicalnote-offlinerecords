@@ -9,7 +9,7 @@
         <emr-tree ref="emrTree" />
       </div>
       <section class="inpatient-emr-navigate-panel-footer">
-        <el-button type="primary" size="mini" @click="showEmrCreateDialog">新增</el-button>
+        <el-button type="primary" size="small" @click="showEmrCreateDialog">新增</el-button>
       </section>
     </div>
     <clinicalnote-creator-dialog
@@ -74,10 +74,6 @@ export default {
     .inpatient-emr-navigate-panel-footer {
       display: flex;
       justify-content: center;
-      padding: 10px;
-      .el-button {
-        width: 50%;
-      }
     }
   }
 }
