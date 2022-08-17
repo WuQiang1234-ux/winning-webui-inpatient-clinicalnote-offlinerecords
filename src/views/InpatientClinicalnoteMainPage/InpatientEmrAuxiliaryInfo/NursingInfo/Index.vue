@@ -16,11 +16,12 @@ export default {
   data() {
     return {}
   },
-  inject: ['patientRootComponent'],
   computed: {},
   watch: {},
   created() {
-    this.eventHubHelper = getEventHubHelper(this.patientRootComponent.eventHub)
+    this.eventHubHelper = getEventHubHelper(
+      this.patientRootComponentStore.state.eventHub
+    )
   },
   mounted() {},
   methods: {
@@ -31,7 +32,8 @@ export default {
         isReplace: false,
         type: 'text',
         content: str,
-        encounterId: this.patientRootComponent.currentPatientInfo.encounterId,
+        encounterId:
+          this.patientRootComponentStore.currentPatientInfo?.encounterId,
       })
     },
   },

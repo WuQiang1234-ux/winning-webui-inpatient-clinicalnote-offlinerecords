@@ -106,7 +106,6 @@ export default {
   mixins: [mixin],
   components: {},
   props: {},
-  inject: ['patientRootComponent'],
   data() {
     return {
       treeLoading: false,
@@ -121,7 +120,10 @@ export default {
   created() {},
   mounted() {
     this.setClinicalnoteTreeData()
-    this.eventHubHelper = getEventHubHelper(this.patientRootComponent.eventHub)
+    this.eventHubHelper = getEventHubHelper(
+      this.patientRootComponentStore.state.eventHub
+    )
+
     const eventHubHelper = this.eventHubHelper
     eventHubHelper.on(
       MultiClinicalnoteBoardEventKeys.TAB_CLICK,
@@ -133,7 +135,7 @@ export default {
   },
   methods: {
     handleAddClinicalnote(data) {
-      this.patientRootComponent.showEmrCreateDialog({
+      this.patientRootComponentStore.commit('emr/showEmrCreateDialog', {
         defaultTemplateClassId: data.rawData.inpatientEmrTypeId,
       })
     },

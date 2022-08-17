@@ -136,7 +136,6 @@ export default {
   props: {
     emrCreateDialogData: { type: Object },
   },
-  inject: ['patientRootComponent'],
   data() {
     return {
       isShow: true,
@@ -174,7 +173,7 @@ export default {
   computed: {
     ...mapState(['orgInfo']),
     currentPatientInfo() {
-      return this.patientRootComponent.currentPatientInfo
+      return this.patientRootComponentStore.state.currentPatientInfo
     },
     currentClinicalnoteTemplateClassDataId() {
       return this.selectedTemplateList.map((el) => el.keyId)

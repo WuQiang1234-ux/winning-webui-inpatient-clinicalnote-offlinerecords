@@ -74,7 +74,9 @@ export default {
   },
   watch: {},
   created() {
-    this.eventHubHelper = getEventHubHelper(this.patientRootComponent.eventHub)
+    this.eventHubHelper = getEventHubHelper(
+      this.patientRootComponentStore.state.eventHub
+    )
   },
   mounted() {
     window.eventBus.$on('TASK_INFORM', this.tastInform)

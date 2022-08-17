@@ -24,7 +24,6 @@ export default {
   name: 'Editor',
   components: { EditorToolbar },
   mixins: [mixins.getInjectMixin()],
-  inject: ['patientRootComponent'],
   props: {
     patientInfo: {
       type: Object,
@@ -156,7 +155,9 @@ export default {
     },
   },
   created() {
-    this.eventHubHelper = getEventHubHelper(this.patientRootComponent.eventHub)
+    this.eventHubHelper = getEventHubHelper(
+      this.patientRootComponentStore.state.eventHub
+    )
     this.pgEditor = null
   },
   async mounted() {

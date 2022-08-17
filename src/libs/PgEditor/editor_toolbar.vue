@@ -185,14 +185,14 @@
         <i class="emr-icon-duanyu"></i>
       </el-button>
     </el-tooltip>
-    <el-tooltip
+    <!-- <el-tooltip
       popper-class="pg-editor-toolbar-tooltips"
       effect="light"
       content="刷新病历"
       placement="bottom"
     >
       <el-button icon="el-icon-refresh" style="font-size:16px" @click="handleRefreshClinicalnote"></el-button>
-    </el-tooltip>
+    </el-tooltip>-->
     <span class="split-line"></span>
     <template v-if="contentRenderMode !== dcEditorRenderModes.A_SETVIEWMODE_WEB">
       <el-tooltip

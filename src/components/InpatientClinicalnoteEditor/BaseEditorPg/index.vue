@@ -128,16 +128,15 @@ export default {
       },
     },
   },
-  inject: ['patientRootComponent'],
   data() {
     return {
       userInfo: {},
       orgInfo: {},
       preservationStatus: true,
       toolbarOptions: {
-        isEmrSubmited: true,
+        isEmrSubmited: false,
         isShowRenderModeRadios: false,
-        annotationStatus: true,
+        annotationStatus: false,
         isShow: true,
         isDisableWorkMode: false,
       },
@@ -152,7 +151,7 @@ export default {
   },
   computed: {
     currentPatientInfo() {
-      return this.patientRootComponent.currentPatientInfo
+      return this.patientRootComponentStore.state.currentPatientInfo
     },
     currentDocId() {
       return this.clinicalnoteData.content.emrSetId.replace('readonly', '')
@@ -193,7 +192,9 @@ export default {
   },
   created() {
     console.log('来了created')
-    this.eventHubHelper = getEventHubHelper(this.patientRootComponent.eventHub)
+    this.eventHubHelper = getEventHubHelper(
+      this.patientRootComponentStore.state.eventHub
+    )
     this.currentDocIdWatch = this.$watch(
       'currentDocId',
       this.currentDocIdHandler,
@@ -248,16 +249,20 @@ export default {
     handleDocumentClick(e) {
       console.log(e, '点击啊点击')
       //切换子文档
-      // if (this.clinicalnoteData.serial) {
-      //   const subDocId = e.docInfo.docId
-      //   if (subDocId !== this.currentDocId) {
-      //     this.isRelocate = false
-      //     this.setCurrentEmrSetSerialId(subDocId)
-      //   }
-      // }
-      // if (this.mode !== DcEditorRenderModes.SET_WORK_MODE_APP) {
-      //   return
-      // }
+      if (this.clinicalnoteData.serial) {
+        const subDocId = e.docInfo.docId
+        // debugger
+        if (subDocId !== this.currentDocId) {
+          this.isRelocate = false
+          this.patientRootComponentStore.commit(
+            'multi_clinicalnote_board_state/setCurrentEmrSetSerialId',
+            subDocId
+          )
+        }
+      }
+      if (this.mode !== DcEditorRenderModes.SET_WORK_MODE_APP) {
+        return
+      }
       //将当前聚焦的输入域信息存起来方便辅助区域插值使用
       this.setPgEditorCurrentInputInfo({
         CurIsImage: e.CurIsImage,
@@ -266,6 +271,7 @@ export default {
       })
       // this.setPatientInformation(e)
     },
+
     //辅助区域向病历插入内容
     async handleAuxiliaryInfoInsert($event) {
       const pgEditor = this.getEditor()
@@ -294,8 +300,8 @@ export default {
 
       if (
         this.currentDocId !==
-        this.patientRootComponent.currentActiveLoadedClinicalnote.options
-          .content.emrSetId
+        this.patientRootComponentStore.state.multi_clinicalnote_board_state
+          .currentActiveLoadedClinicalnote.options.content.emrSetId
       ) {
         console.log('非当前激活的病历不更新')
         return

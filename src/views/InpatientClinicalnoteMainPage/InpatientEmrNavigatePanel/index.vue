@@ -13,8 +13,8 @@
       </section>
     </div>
     <clinicalnote-creator-dialog
-      :emrCreateDialogData="patientRootComponent.emrCreateDialogData"
-      v-if="patientRootComponent.emrCreateDialogData.isShow"
+      :emrCreateDialogData="patientRootComponentStore.state.emr.emrCreateDialogData"
+      v-if="patientRootComponentStore.state.emr.emrCreateDialogData.isShow"
       @clinicalnoteCreated="handleTabChange(selectedTab)"
     />
   </div>
@@ -29,22 +29,19 @@ export default {
     EmrTree,
     ClinicalnoteCreatorDialog,
   },
-  inject: ['patientRootComponent'],
   data() {
-    return {
-      emrCreateDialogData: {
-        isShow: false,
-      },
-    }
+    return {}
   },
   computed: {},
   watch: {},
-  created() {},
+  created() {
+    console.log(this.patientRootComponentStore, 'patientRootComponentStore')
+  },
   mounted() {},
   beforeDestroy() {},
   methods: {
     showEmrCreateDialog() {
-      this.patientRootComponent.showEmrCreateDialog()
+      this.patientRootComponentStore.commit('emr/showEmrCreateDialog')
     },
     handleTabChange() {
       this.$refs.emrTree.getClinicalnoteTree()

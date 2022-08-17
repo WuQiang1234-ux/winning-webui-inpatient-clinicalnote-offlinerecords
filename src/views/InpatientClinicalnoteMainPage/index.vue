@@ -38,20 +38,19 @@ import $ from 'jquery'
 import NavigatePanel from './InpatientEmrNavigatePanel/index.vue'
 import EditArea from './InpatientEmrEditArea/index.vue'
 import AuxiliaryInfo from './InpatientEmrAuxiliaryInfo/Index.vue'
-import multi_clinicalnote_board_state from './mixins/multi_clinicalnote_board_state'
-import emr from './mixins/emr'
+
 import { createNamespacedHelpers } from 'vuex'
 const { mapState: patientInfoMapState } = createNamespacedHelpers('patientInfo')
 export default {
-  name: '',
+  name: 'patientRootComponent',
   components: { NavigatePanel, EditArea, AuxiliaryInfo },
-  props: {},
-  provide() {
-    return {
-      patientRootComponent: this,
-    }
+  props: {
+    particulars: {
+      type: Object,
+    },
   },
-  mixins: [multi_clinicalnote_board_state, emr],
+
+  provide() {},
   data() {
     return {
       patientLoding: false,
@@ -60,7 +59,12 @@ export default {
       isHiddenRight: true, //是否隐藏右侧
     }
   },
-  created() {},
+  created() {
+    this.patientRootComponentStore.commit(
+      'setCurrentPatientInfo',
+      this.particulars
+    )
+  },
   mounted() {
     //1920及以下宽度右侧拖拽改变宽度
     this.dragControllerDiv()

@@ -55,6 +55,7 @@ export default {
     Editor,
   },
   mixins: [mixins.getProvideMixin()],
+
   props: {
     consultationReplyDepOptions: {
       type: Object,
@@ -149,11 +150,7 @@ export default {
       return editorId
     },
     patientInfoGetter() {
-      const patientInfo = this.patientInfo
-      if (!patientInfo) {
-        return getCurrentPatientInfo()
-      }
-      return patientInfo
+      return this.patientRootComponentStore?.state?.currentPatientInfo
     },
     userInfoGetter() {
       const userInfo = this.userInfo
@@ -176,7 +173,23 @@ export default {
       userInfo: this.userInfoGetter,
     }
   },
-  watch: {},
+  watch: {
+    toolbarOptions: {
+      handler(newVal) {
+        // debugger
+        this.store.toolbar.mutations.setState(newVal)
+      },
+      deep: true,
+      immediate: true,
+    },
+    'store.editor.state.editorOptions.ContentRenderMode': {
+      handler(newVal, oldVal) {
+        // 监听编辑器工作模式传参数
+        this.switchContentRenderMode(newVal, oldVal)
+      },
+      immediate: true,
+    },
+  },
   beforeDestroy() {},
   created() {
     this.pgEditorInstance = null // 保存编辑器实例

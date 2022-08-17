@@ -6,11 +6,15 @@ const packageName = 'winning-webui-inpatient-clinicalnote-offlinerecords'
 module.exports = {
   // 设置打包后用相对路径（设置值为空）
   publicPath: '',
-
+  configureWebpack: (config) => {
+    //调试JS
+    config.devtool = 'source-map'
+  },
   chainWebpack: (config) => {
     config.externals({
       Bzip2: 'Bzip2',
     })
+
     //   const oneOfsMap = config.module.rule('scss').oneOfs.store
     //   oneOfsMap.forEach((item) => {
     //     item

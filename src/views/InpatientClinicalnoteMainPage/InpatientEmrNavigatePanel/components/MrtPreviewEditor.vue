@@ -54,7 +54,6 @@ export default {
       mrtPreviewList: [],
     }
   },
-  inject: ['patientRootComponent'],
   watch: {
     mrtList: {
       handler: async function (v) {
@@ -166,7 +165,7 @@ export default {
   },
   computed: {
     currentPatientInfo() {
-      return this.patientRootComponent.currentPatientInfo
+      return this.patientRootComponentStore.currentPatientInfo
     },
   },
 }

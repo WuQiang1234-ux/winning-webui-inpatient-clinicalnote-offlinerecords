@@ -2,7 +2,6 @@ import { ClinicalnoteTypes } from '@/components/MultiClinicalnoteBoard'
 import getEventHubHelper from '@/utils/event_hub_helper.js'
 let mixin = {
   components: {},
-  inject: ['patientRootComponent'],
   props: {
     publicParameters: {
       type: Object,
@@ -13,29 +12,36 @@ let mixin = {
   },
   computed: {
     currentEmrSetId() {
-      return this.patientRootComponent.currentActiveLoadedClinicalnote?.options
-        ?.content?.emrSetId
+      return this.patientRootComponentStore.state.multi_clinicalnote_board_state
+        .currentActiveLoadedClinicalnote?.options?.content?.emrSetId
     },
     currentPatientInfo() {
-      return this.patientRootComponent.currentPatientInfo
+      return this.patientRootComponentStore.state.currentPatientInfo
     },
   },
   watch: {
-    'patientRootComponent.currentActiveLoadedClinicalnote.id'(v) {
+    'patientRootComponentStore.multi_clinicalnote_board_state.currentActiveLoadedClinicalnote.id'(
+      v
+    ) {
       if (v) {
-        console.log('改了', this.patientRootComponent)
+        console.log(
+          '改了',
+          this.patientRootComponentStore.state.multi_clinicalnote_board_state
+        )
         // if (this.activateMenu == 'emr_tree') {
         this.treeDefaultExpandedKeys = []
         this.treeDefaultExpandedKeys?.push(
-          this.patientRootComponent.currentActiveLoadedClinicalnote.options
-            .content.emrTypeId
+          this.patientRootComponentStore.state.multi_clinicalnote_board_state
+            .currentActiveLoadedClinicalnote.options.content.emrTypeId
         )
         // }
       }
     },
   },
   created() {
-    this.eventHubHelper = getEventHubHelper(this.patientRootComponent.eventHub)
+    this.eventHubHelper = getEventHubHelper(
+      this.patientRootComponentStore.state.eventHub
+    )
   },
   beforeDestroy() {
     this.eventHubHelper.destroy()
@@ -81,11 +87,17 @@ let mixin = {
             },
           },
         }
-        console.log(obj, '======0==========')
-        this.patientRootComponent.addToLoadedClinicalnoteList(obj)
+        console.log(obj, '======0==========', this.patientRootComponentStore)
+        this.patientRootComponentStore.commit(
+          'multi_clinicalnote_board_state/addToLoadedClinicalnoteList',
+          obj
+        )
       }
 
-      this.patientRootComponent.setCurrentActiveClinicalnoteById(id)
+      this.patientRootComponentStore.commit(
+        'multi_clinicalnote_board_state/setCurrentActiveClinicalnoteById',
+        id
+      )
     },
     //连续病历处理
     async openEmrSetSerial(data) {
@@ -125,19 +137,30 @@ let mixin = {
             },
           },
         }
-        this.patientRootComponent.addToLoadedClinicalnoteList(obj)
+        this.patientRootComponentStore.commit(
+          'multi_clinicalnote_board_state/addToLoadedClinicalnoteList',
+          obj
+        )
       }
-      this.patientRootComponent.setCurrentActiveClinicalnoteById(_uniqueId)
+      this.patientRootComponentStore.commit(
+        'multi_clinicalnote_board_state/setCurrentActiveClinicalnoteById',
+        _uniqueId
+      )
       //连续病历更新成当前查看病历的id todo 需要处理
-      this.patientRootComponent.setCurrentEmrSetSerialId(id)
+      this.patientRootComponentStore.commit(
+        'multi_clinicalnote_board_state/setCurrentEmrSetSerialId',
+        id
+      )
       // 更换成编辑图标
       // this.NewAndChangedIcon()
     },
     async deleteClinicalnote() {},
     hasInLoadedClinicalnoteList(id) {
-      return this.patientRootComponent.loadedClinicalnoteList.find((v) => {
-        return v.id == id
-      })
+      return this.patientRootComponentStore.state.multi_clinicalnote_board_state.loadedClinicalnoteList.find(
+        (v) => {
+          return v.id == id
+        }
+      )
     },
     async handleDeleteClinicalnote(data1) {
       data1.loading = true
