@@ -119,7 +119,7 @@ export default {
   watch: {},
   created() {},
   mounted() {
-    this.setClinicalnoteTreeData()
+    this.getClinicalnoteTree()
     this.eventHubHelper = getEventHubHelper(
       this.patientRootComponentStore.state.eventHub
     )
@@ -129,6 +129,7 @@ export default {
       MultiClinicalnoteBoardEventKeys.TAB_CLICK,
       this.handleMutiClinicalnoteBoardTabClick
     )
+    eventHubHelper.on('clinicalnote/refreshTreeData', this.getClinicalnoteTree)
   },
   beforeDestroy() {
     this.eventHubHelper.destroy()
@@ -139,9 +140,15 @@ export default {
         defaultTemplateClassId: data.rawData.inpatientEmrTypeId,
       })
     },
-    setClinicalnoteTreeData() {
+    getClinicalnoteTree(obj) {
       this.clinicalnoteTreeData = this.filterClinicalnoteTreeData(treeData.data)
-      console.log(this.clinicalnoteTreeData, 'this.clinicalnoteTreeData ')
+      if (obj) {
+        this.treeDefaultExpandedKeys = [obj.inpatEmrTypeId]
+        setTimeout(() => {
+          console.log(this.$refs)
+          this.$refs[obj.inpatEmrSetId].click()
+        })
+      }
     },
     filterClinicalnoteTreeData(data) {
       // let hasAnyEmrCreated = false

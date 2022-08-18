@@ -121,6 +121,7 @@
 import MrtPreviewEditor from './components/MrtPreviewEditor.vue'
 import TemplateTree from './components/TemplateTree.vue'
 import { mapState } from 'vuex'
+import getEventHubHelper from '@/utils/event_hub_helper.js'
 import {
   surgeryOrNot,
   //  expertiseConceptId
@@ -193,6 +194,9 @@ export default {
   watch: {},
   created() {},
   mounted() {
+    this.eventHubHelper = getEventHubHelper(
+      this.patientRootComponentStore.state.eventHub
+    )
     this.handleDialogOpen()
   },
   methods: {
@@ -726,12 +730,12 @@ export default {
       //         data.emrSetId
       //       )
       //     } else {
-      //       this.$root.eventHub.$emit('clinicalnote/refreshTreeData', {
-      //         inpatEmrTypeId: clinicalnoteArr[0].data.inpEmrClassId,
-      //         inpatEmrSetId: data.emrSetId
-      //       })
+      this.eventHubHelper.emit('clinicalnote/refreshTreeData', {
+        inpatEmrTypeId: clinicalnoteArr[0].data.inpEmrClassId,
+        inpatEmrSetId: '241617551325681665',
+      })
       //     }
-      //     this.handleDialogClose()
+      this.handleDialogClose()
       //   } else {
       //     this.$message({
       //       message: data.commonOutputInfo.returnMsg,

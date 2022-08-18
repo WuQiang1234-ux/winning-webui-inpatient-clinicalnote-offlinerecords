@@ -1,7 +1,7 @@
 <template>
   <div :class="$style.box">
     <!-- <el-empty :description="text"></el-empty> -->
-    <el-empty description="描述文字"></el-empty>
+    <el-empty :description="text"></el-empty>
   </div>
 </template>
 
