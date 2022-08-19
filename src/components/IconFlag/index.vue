@@ -1,7 +1,20 @@
 <template>
   <div>
     <!-- 暂时用这个代替一下 -->
-    <i class="emr-icon-cancel"></i>
+    <!-- <i class="emr-icon-cancel"></i> -->
+    <svg
+      class="icon"
+      aria-hidden="true"
+      v-if="iconImages[data.currentStatusCode]"
+      :class="{
+      editing: data.id === id,
+      
+      forbid: data.currentStatusCode == '399572897'
+    }"
+      :style="{fill:!data.rawData.writeSelf?'#2db7a0':'#48adf3'}"
+    >
+      <use :xlink:href="'#'+iconImages[data.currentStatusCode]" />
+    </svg>
     <!-- <SymbolIcon
       v-if="iconImages[data.printedcode] && type == 'tree'"
       :icon-class="iconImages[data.printedcode]"
@@ -77,6 +90,10 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.icon {
+  height: 20px;
+  width: 20px;
+}
 .icon_emr_status {
   flex: 0 0 auto;
   width: 22px;

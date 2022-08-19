@@ -60,7 +60,7 @@ export default {
   .container-section {
     flex: 1 1 auto;
     width: 100%;
-    height: calc(100% - 60px);
+    height: calc(100% - 111px);
     display: flex;
     .container-letft-patient-list {
       width: 200px;

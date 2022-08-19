@@ -23,7 +23,8 @@
 </template>
 
 <script>
-import { createNamespacedHelpers } from 'vuex'
+import { createNamespacedHelpers, mapState } from 'vuex'
+
 import { throttle } from '@/utils/index'
 import {
   compress,
@@ -51,6 +52,7 @@ import { cb2promise } from '@/utils/convertFunction'
 import PgEditor from '@/libs/PgEditor'
 import { data1, data2 } from './textData'
 import { createEventKeyWithNamespace } from '@/utils/event_hub_helper.js'
+import printMixin from './mixins/print'
 const createEventKey = createEventKeyWithNamespace(
   'INPATIENT_CLINICALNOTE_EDITOR_EVENT'
 )
@@ -131,11 +133,9 @@ export default {
   },
   data() {
     return {
-      userInfo: {},
-      orgInfo: {},
       preservationStatus: true,
       toolbarOptions: {
-        isEmrSubmited: false,
+        isEmrSubmited: true, //是否能打印
         isShowRenderModeRadios: false,
         annotationStatus: false,
         isShow: true,
@@ -150,7 +150,11 @@ export default {
       isRelocate: true, //判断是否需要重定位（点击病历内容切换子文档时不需要重定位）
     }
   },
+  mixins: [
+    printMixin, //打印
+  ],
   computed: {
+    ...mapState(['userInfo', 'orgInfo']),
     currentPatientInfo() {
       return this.patientRootComponentStore.state.currentPatientInfo
     },
@@ -233,6 +237,100 @@ export default {
       ClinicalnoteEditorEventKeys.MEDICAL_RECORDS_BEFORE_DELETION,
       this.handleTabRemove
     )
+    pgEditor.eventEmitter.$on(EditorEvent.PG_EVENT_PRINT_DOCUMENT, async () => {
+      // debugger
+      this.showClinicalnoteProcessing(true)
+      const { bizRoleId, encounterId } = this.currentPatientInfo
+      const { hospitalSOID } = this.userInfo
+      let emrDocInfo = []
+      let {
+        content: {
+          inpMrtMonitorId,
+          emrTypeId,
+          mrtEditorTypeCode,
+          emrSetId,
+          emrSetTitle,
+          inpatEmrSetStatusCode,
+        },
+      } = this.clinicalnoteData
+
+      try {
+        if (emrTypeId == '121383422926546946') {
+          await this.serialPrint(
+            this.loadedSubDocList,
+            emrTypeId,
+            pgEditor,
+            inpMrtMonitorId,
+            emrDocInfo
+          )
+        } else if (
+          emrTypeId == '121383422926546950' &&
+          mrtEditorTypeCode == '399461578'
+        ) {
+          await this.consultationPrint(
+            emrSetId.replace('readonly', ''),
+            pgEditor,
+            emrTypeId,
+            emrSetTitle,
+            inpatEmrSetStatusCode,
+            emrDocInfo
+          )
+        } else {
+          await this.ordinaryPrint(
+            emrSetId.replace('readonly', ''),
+            pgEditor,
+            inpatEmrSetStatusCode,
+            emrTypeId,
+            emrSetTitle,
+            emrDocInfo
+          )
+        }
+
+        const params = {
+          eventId: '399468946', // 打印
+          normalPrint: true, //true普通打印，false集中打印
+          printerName: null, //普通打印为空
+          hospitalSOID: hospitalSOID,
+          encounterId: encounterId,
+          printCount: 0,
+          bizRoleId: bizRoleId,
+          emrDocInfo,
+          // token: Cookies.get('BEARER_TOKEN'),
+          printSourceCode:
+            this.embedEntrance == 'nurse' ? 399464668 : 399464667, //打印入口 打印渠道 护士站：399464668,医生站：399464667
+        }
+        console.log('现在需要打印', params)
+        // 规则校验
+        // if (emrDocInfo.length) {
+        //   let _res = await api.clinicalnoteTouchAction({
+        //     touchActionCode: '399542636',
+        //     encounterId: this.currentPatientInfo.encounterId,
+        //     inpEmrClassId: this.clinicalnoteData.content.emrTypeId,
+        //     inpMrtMonitorId,
+        //   })
+        //   if (!_res.success) {
+        //     return
+        //   }
+        // }
+        this.showClinicalnoteProcessing(false)
+        try {
+          window.winning.inpreport.inpEmrPrint(
+            JSON.stringify(params),
+            (res) => {
+              console.log('都昌病历打印回调 --------- ', res)
+            }
+          )
+        } catch (e) {
+          console.log(e, '----------------')
+          this.$message({
+            message: '该功能需在混合框架中使用！',
+            type: 'warning',
+          })
+        }
+      } catch (e) {
+        this.showClinicalnoteProcessing(false)
+      }
+    })
   },
   methods: {
     ...componentsMapMutations([

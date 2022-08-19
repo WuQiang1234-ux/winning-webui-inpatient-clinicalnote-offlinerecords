@@ -10,7 +10,16 @@
       <template v-for="el in tabPaneList">
         <el-tab-pane :key="el.code" :label="el.label" :name="el.name">
           <!-- 生命体征 -->
-          <nursing-info v-if="activeName === el.name && el.code == '399574003'"></nursing-info>
+          <!-- <nursing-info v-if="activeName === el.name && el.code == '399574003'"></nursing-info> -->
+          <!-- 短语引用 -->
+          <phrase-refen
+            v-if="el.code == '399574005'"
+            v-show="activeName === el.name"
+            :auxiliaryTab="activeName"
+          ></phrase-refen>
+          <!-- 既往病历 -->
+          <!-- 从主界面进入不显示当前的病历，从会诊管理和任务中心的会诊进入则需要显示当前病历 -->
+          <emr-history v-if="activeName === el.name && el.code == '399573998'"></emr-history>
         </el-tab-pane>
       </template>
     </el-tabs>
@@ -20,11 +29,13 @@
 <script>
 // /*global $:true*/
 // import $ from 'jquery'
-import NursingInfo from './NursingInfo/Index.vue'
+import PhraseRefen from './PhraseRefen/Index'
+import EmrHistory from './EmrHistory/Index.vue'
 export default {
   name: 'InpatientEmrAuxiliaryInfo',
   components: {
-    NursingInfo,
+    PhraseRefen,
+    EmrHistory,
   },
   props: {
     isShowContent: {
@@ -43,10 +54,15 @@ export default {
       auxiliaryInfoKey: +new Date(),
       tabPaneList: [
         {
-          label: '生命体征',
-          code: '399574003',
-          name: 'nursingInfo',
-        }, //'生命体征'
+          label: '短语引用',
+          code: '399574005',
+          name: 'phraseRefen',
+        },
+        {
+          label: '既往病历',
+          code: '399573998',
+          name: 'emrHistory',
+        },
       ], //全量的,
     }
   },
