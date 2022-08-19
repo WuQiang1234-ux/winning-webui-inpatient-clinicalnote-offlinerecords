@@ -1,8 +1,6 @@
 <template>
   <div class="inpatient-emr-edit-area-wrap">
-    <MultiClinicalnoteBoard
-      v-show="this.$patientRootComponentStore.state.multi_clinicalnote_board_state.loadedClinicalnoteList.length"
-    />
+    <MultiClinicalnoteBoard v-show="loadedClinicalnoteList.length" />
   </div>
 </template>
 
@@ -15,7 +13,12 @@ export default {
   data() {
     return {}
   },
-  computed: {},
+  computed: {
+    loadedClinicalnoteList() {
+      return this.$patientRootComponentStore.state
+        .multi_clinicalnote_board_state.loadedClinicalnoteList
+    },
+  },
   watch: {},
   created() {},
   mounted() {},

@@ -101,6 +101,24 @@ export default {
   },
   computed: {
     ...componentsMapStates(['clinicalnoteProcessing']),
+    loadedClinicalnoteIdList() {
+      return this.$patientRootComponentStore.getters[
+        'multi_clinicalnote_board_state/loadedClinicalnoteIdList'
+      ]
+    },
+    currentActiveLoadedClinicalnoteId() {
+      return this.$patientRootComponentStore.getters[
+        'multi_clinicalnote_board_state/currentActiveLoadedClinicalnoteId'
+      ]
+    },
+    loadedClinicalnoteList() {
+      return this.$patientRootComponentStore.state
+        .multi_clinicalnote_board_state.loadedClinicalnoteList
+    },
+    currentPatientInfo() {
+      return this.$patientRootComponentStore.state.currentPatientInfo
+    },
+
     clinicalnoteTypes() {
       return ClinicalnoteTypes
     },
@@ -126,15 +144,8 @@ export default {
       // let _target = this.loadedClinicalnoteList.find((v) => {
       //   return v.id == id
       // })
-      console.log(
-        this.$patientRootComponentStore.getters[
-          'multi_clinicalnote_board_state/loadedClinicalnoteIdList'
-        ]
-      )
-      let _index =
-        this.$patientRootComponentStore.getters[
-          'multi_clinicalnote_board_state/loadedClinicalnoteIdList'
-        ].indexOf(id)
+      console.log(this.loadedClinicalnoteIdList)
+      let _index = this.loadedClinicalnoteIdList.indexOf(id)
       this.$patientRootComponentStore.commit(
         'multi_clinicalnote_board_state/deleteInLoadedClinicalnoteListById',
         id
@@ -146,24 +157,17 @@ export default {
         if (_index - 1 >= 0) {
           this.$patientRootComponentStore.commit(
             'multi_clinicalnote_board_state/setCurrentActiveClinicalnoteById',
-            this.$patientRootComponentStore.state.multi_clinicalnote_board_state
-              .loadedClinicalnoteIdList[_index - 1]
+            this.loadedClinicalnoteIdList[_index - 1]
           )
         } else {
           this.$patientRootComponentStore.commit(
             'multi_clinicalnote_board_state/setCurrentActiveClinicalnoteById',
-            this.$patientRootComponentStore.getters[
-              'multi_clinicalnote_board_state/loadedClinicalnoteIdList'
-            ][0]
+            this.loadedClinicalnoteIdList[0]
           )
         }
       }
 
-      if (
-        this.$patientRootComponentStore.getters[
-          'multi_clinicalnote_board_state/loadedClinicalnoteIdList'
-        ].length == 0
-      ) {
+      if (this.loadedClinicalnoteIdList.length == 0) {
         this.$patientRootComponentStore.commit(
           'multi_clinicalnote_board_state/clearLoadedClinicalnoteList'
         )
@@ -200,31 +204,18 @@ export default {
           () => {
             this.handleDoDelete(id)
           },
-          this.$patientRootComponentStore.state.currentPatientInfo?.encounterId
+          this.currentPatientInfo?.encounterId
         )
       }
     },
     handleTabClick(tab) {
-      if (
-        tab.name ==
-        this.$patientRootComponentStore.getters[
-          'multi_clinicalnote_board_state/currentActiveLoadedClinicalnoteId'
-        ]
-      )
-        return
+      if (tab.name == this.currentActiveLoadedClinicalnoteId) return
       this.$patientRootComponentStore.commit(
         'multi_clinicalnote_board_state/setCurrentActiveClinicalnoteById',
         tab.name
       )
-      if (
-        this.$patientRootComponentStore.getters[
-          'multi_clinicalnote_board_state/currentActiveLoadedClinicalnoteId'
-        ].includes('readonly')
-      )
-        return
-      let currentClinicalnote =
-        this.$patientRootComponentStore.state.multi_clinicalnote_board_state
-          .loadedClinicalnoteList[tab.index]
+      if (this.currentActiveLoadedClinicalnoteId.includes('readonly')) return
+      let currentClinicalnote = this.loadedClinicalnoteList[tab.index]
       let id = this.getEmrSetId(currentClinicalnote)
       console.log(
         currentClinicalnote.options.content.emrTypeId,
