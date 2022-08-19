@@ -1,7 +1,8 @@
 import { ClinicalnoteTypes } from '@/components/MultiClinicalnoteBoard'
 import getEventHubHelper from '@/utils/event_hub_helper.js'
+import iconFlagComponent from '@/components/IconFlag'
 let mixin = {
-  components: {},
+  components: { iconFlagComponent },
   props: {
     publicParameters: {
       type: Object,

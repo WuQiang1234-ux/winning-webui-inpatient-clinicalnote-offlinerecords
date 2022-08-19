@@ -9,9 +9,9 @@
         :key="item.encounterId"
       >{{item.name}}</li>
     </ul>
-    <div class="patient-list-add">
+    <!-- <div class="patient-list-add">
       <el-button type="primary" size="small" @click="addPatient">新增患者</el-button>
-    </div>
+    </div>-->
   </div>
 </template>
 
@@ -63,6 +63,7 @@ export default {
   height: 100%;
   position: relative;
   border-right: 1px solid #c8d0e8;
+  background: var(--COLOR-ACTIVE-BG, #eef2fd);
   .patient-list {
     height: 100%;
     width: 100%;

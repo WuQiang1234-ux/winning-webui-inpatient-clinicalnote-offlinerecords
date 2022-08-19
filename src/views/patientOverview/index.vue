@@ -54,7 +54,7 @@ export default {
     display: flex;
     align-items: center;
     border-bottom: 1px solid #c8d0e8;
-    height: 60px;
+    height: 120px;
     box-sizing: border-box;
   }
   .container-section {

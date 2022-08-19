@@ -18,6 +18,14 @@
           class="custom-tree-node"
           :class="{ 'custom-tree-node-img': data.isRoot }"
         >
+          <el-tooltip
+            v-if="!data.isRoot"
+            effect="dark"
+            :content="statusText[data.currentStatusCode]"
+            placement="right"
+          >
+            <iconFlagComponent :id="currentEmrSetId" :data="data" type="tree"></iconFlagComponent>
+          </el-tooltip>
           <div class="node-name">
             <template v-if="data.isRoot">{{ data.label }}</template>
             <el-tooltip v-else effect="dark" placement="right">
@@ -96,6 +104,7 @@
 
 <script>
 import dayjs from 'dayjs'
+import { statusText } from '@/utils/enumerate.js'
 import { debounce } from '@/utils/index'
 import getEventHubHelper from '@/utils/event_hub_helper.js'
 import { MultiClinicalnoteBoardEventKeys } from '@/components/MultiClinicalnoteBoard'
@@ -112,6 +121,7 @@ export default {
       clinicalnoteTreeData: [],
       treeDefaultExpandedKeys: [], //树展开的目录id
       deleteThePrompt: false,
+      statusText,
       isShowAddButton: true,
     }
   },

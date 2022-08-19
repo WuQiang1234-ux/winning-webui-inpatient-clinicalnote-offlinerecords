@@ -44,6 +44,7 @@ import {
   EditorEvent,
   DcEditorRenderModes,
   DataElementWinIds,
+  TagImage,
 } from '@/libs/PgEditor/constants'
 import getEventHubHelper from '@/utils/event_hub_helper.js'
 import { cb2promise } from '@/utils/convertFunction'
@@ -159,6 +160,8 @@ export default {
     ...componentsMapStates(['pgEditorCurrentInputInfo']),
     //已加载的病程
     loadedSubDocList() {
+      console.log(this.clinicalnoteData)
+
       return this.clinicalnoteData.content.list ?? []
     },
     classNames() {
@@ -590,7 +593,10 @@ export default {
       })
 
       let list = this.loadedSubDocList
+      let docId = undefined //只有在已打开的病程列表里插入一份新病历  才需要docId
+
       if (list.length) {
+        docId = contentList[0].id
         //插入一份病程（新增或更新位置）
         console.time('测试插入病程加载速度-----')
         let index = await this.insertSubDocsAction(contentList[0])
@@ -601,7 +607,10 @@ export default {
         console.time('测试连续病程加载速度-----')
         await this.loadSerialClinicalnoteXmlAsync(contentList)
         console.timeEnd('测试连续病程加载速度-----')
+        list.push(...contentList)
       }
+      //设置病历的状态
+      this.tagImageByClinicalnoteStatus(docId)
       //关闭loading
       this.showClinicalnoteProcessing(false)
 
@@ -920,7 +929,8 @@ export default {
       const pgEditor = this.getEditor()
       //水印
       // pgEditor.setWaterMark().catch(() => {})
-
+      //设置病历的状态
+      this.tagImageByClinicalnoteStatus()
       console.log('设置光标位置到文档的最始 ---------- ')
       setTimeout(() => {
         pgEditor.pgEditorInstance.postmessage({
@@ -1384,6 +1394,61 @@ export default {
           }
         }
       }
+    },
+    //状态图标预加载--防止状态图标重影
+    async preLoadTagImage(list) {
+      let imgList = Array.from(new Set(list.map((v) => v.statusImage)))
+      return new Promise((resolve) => {
+        let loadNum = 0
+        for (let i = 0; i < imgList.length; i++) {
+          const img = new Image()
+          img.setAttribute('crossOrigin', 'Anonymous')
+          img.src = imgList[i]
+          img.onload = async () => {
+            loadNum++
+            if (loadNum == imgList.length) {
+              resolve(true)
+            }
+          }
+          img.onerror = () => {
+            resolve(false)
+          }
+        }
+      })
+    },
+    async tagImageByClinicalnoteStatus(id) {
+      let param = []
+      if (this.clinicalnoteData.serial) {
+        if (id) {
+          let emrStatusCode = this.loadedSubDocList.find(
+            (v) => v.id == id
+          )?.emrStatusCode
+          param.push({
+            docId: id,
+            statusImage: TagImage[emrStatusCode],
+          })
+        } else {
+          param = this.loadedSubDocList.map((v) => {
+            return {
+              docId: v.id,
+              statusImage: TagImage[v?.emrStatusCode],
+            }
+          })
+        }
+      } else {
+        let emrStatusCode = this.clinicalnoteData?.content?.emrStatusCode
+        param = [
+          { docId: this.currentDocId, statusImage: TagImage[emrStatusCode] },
+        ]
+      }
+
+      console.log(param, 'param%%%%')
+      await this.preLoadTagImage(param)
+      const pgEditor = this.getEditor()
+      pgEditor.pgEditorInstance.postmessage({
+        type: 'SetDocStatusImage',
+        param,
+      })
     },
     //关闭当前病历判断是否保存
     handleTabRemove(id, fn, encounterId) {

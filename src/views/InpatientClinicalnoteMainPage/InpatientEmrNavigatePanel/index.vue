@@ -71,6 +71,9 @@ export default {
     .inpatient-emr-navigate-panel-footer {
       display: flex;
       justify-content: center;
+      .el-button {
+        width: 50%;
+      }
     }
   }
 }
