@@ -36,6 +36,7 @@ import {
 import { cb2promise } from '@/utils/convertFunction'
 import mixins from './mixins'
 import Editor from './editor'
+
 // import DiagnosisHelper from './helper/diagnosis_helper'
 // import SignatureHelper, {
 //   ConsultationSignatureHelper,

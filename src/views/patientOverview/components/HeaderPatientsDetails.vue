@@ -25,20 +25,31 @@
       </div>
       <div class="item">
         <div class="header_title">姓名：</div>
-        {{currentActiveLoadedPatient.fullName}}
+        <span class="header_title_describe">{{currentActiveLoadedPatient.fullName}}</span>
       </div>
       <div class="item">
-        <div class="header_title">床号：</div>
-        {{currentActiveLoadedPatient.bedNo}}
+        <div class="header_title">入区时间：</div>
+        <span class="header_title_describe">{{currentActiveLoadedPatient.firstAdmittedToWardAt}}</span>
+      </div>
+      <div class="item">
+        <div class="header_title">性别：</div>
+        <span
+          class="header_title_describe"
+        >{{currentActiveLoadedPatient.genderCode== '50602'?"男":"女"}}性</span>
       </div>
       <div class="item">
         <div class="header_title">科室：</div>
-        {{currentActiveLoadedPatient.currentDeptName}}
+        <span class="header_title_describe">{{currentActiveLoadedPatient.currentDeptName}}</span>
       </div>
       <div class="item">
+        <div class="header_title">床号：</div>
+        <span class="header_title_describe">{{currentActiveLoadedPatient.bedNo}}</span>
+      </div>
+
+      <!-- <div class="item">
         <div class="header_title">encounterId：</div>
         {{currentActiveLoadedPatient.encounterId}}
-      </div>
+      </div>-->
     </div>
   </div>
 </template>
@@ -65,7 +76,7 @@ export default {
 .header_Patients_details {
   width: 100%;
 
-  margin: auto;
+  margin: 0px;
   .winex {
     height: 40px;
     background: var(--COLOR-NORMAL, #2d5afa);
@@ -115,7 +126,7 @@ export default {
     .item {
       display: flex;
       justify-items: center;
-      align-items: center;
+      align-items: baseline;
 
       /deep/.el-input__inner {
         width: 20px;
@@ -123,6 +134,9 @@ export default {
       }
       .header_title {
         font-size: 26px;
+      }
+      .header_title_describe {
+        font-size: 20px;
       }
       .icon {
         height: 50px;

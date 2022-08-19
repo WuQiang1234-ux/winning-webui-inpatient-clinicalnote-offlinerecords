@@ -15,11 +15,11 @@ import EditorToolbar from './editor_toolbar'
 // import AllographDialog from './components/AllographDialog.vue'
 import { ClassNamespace, EditorEvent, DataElementWinIds } from './constants'
 import mixins from './mixins'
-import { createNamespacedHelpers, mapState } from 'vuex'
+import { mapState } from 'vuex'
 import getEventHubHelper from '@/utils/event_hub_helper.js'
-const { mapState: clinicalnoteMapStates } = createNamespacedHelpers('emr')
-const { mapState: globalConfigMapStates, mapActions: globalConfigActions } =
-  createNamespacedHelpers('globalConfig')
+// const { mapState: clinicalnoteMapStates } = createNamespacedHelpers('emr')
+// const { mapState: globalConfigMapStates, mapActions: globalConfigActions } =
+//   createNamespacedHelpers('globalConfig')
 export default {
   name: 'Editor',
   components: { EditorToolbar },
@@ -66,9 +66,9 @@ export default {
     }
   },
   computed: {
-    ...mapState(['userInfo', 'orgInfo', 'qualityControlData']),
-    ...clinicalnoteMapStates(['AllConfigure', 'RightMenuSetting']),
-    ...globalConfigMapStates(['emrColorConfig', 'doctorExpertise']),
+    ...mapState(['userInfo', 'orgInfo']),
+    // ...clinicalnoteMapStates(['AllConfigure', 'RightMenuSetting']),
+    // ...globalConfigMapStates(['emrColorConfig', 'doctorExpertise']),
     /*
      * 是否支持从外部编辑器复制粘贴
      * '0' 可以随意复制粘贴
@@ -164,7 +164,7 @@ export default {
     this.init()
   },
   methods: {
-    ...globalConfigActions(['getEmrStyleConfig', 'getDoctorExpertise']),
+    // ...globalConfigActions(['getEmrStyleConfig', 'getDoctorExpertise']),
     async init() {
       const pgEditorDom = this.$refs.pgEditor
 
