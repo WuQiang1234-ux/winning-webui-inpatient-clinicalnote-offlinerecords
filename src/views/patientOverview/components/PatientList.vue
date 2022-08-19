@@ -7,7 +7,7 @@
         v-for="item in patientList"
         @click="patientChange(item)"
         :key="item.encounterId"
-      >{{item.name}}</li>
+      >{{item.fullName}}</li>
     </ul>
     <!-- <div class="patient-list-add">
       <el-button type="primary" size="small" @click="addPatient">新增患者</el-button>

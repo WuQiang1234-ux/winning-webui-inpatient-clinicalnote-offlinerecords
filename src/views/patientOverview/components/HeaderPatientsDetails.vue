@@ -25,13 +25,15 @@
       </div>
       <div class="item">
         <div class="header_title">姓名：</div>
-        测试{{currentActiveLoadedPatient.name}}
+        {{currentActiveLoadedPatient.fullName}}
       </div>
       <div class="item">
-        <div class="header_title">床号：</div>1
+        <div class="header_title">床号：</div>
+        {{currentActiveLoadedPatient.bedNo}}
       </div>
       <div class="item">
-        <div class="header_title">科室：</div>骨科
+        <div class="header_title">科室：</div>
+        {{currentActiveLoadedPatient.currentDeptName}}
       </div>
       <div class="item">
         <div class="header_title">encounterId：</div>

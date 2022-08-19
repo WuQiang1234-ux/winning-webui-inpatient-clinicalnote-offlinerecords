@@ -628,26 +628,6 @@ export const apiMedicalManagerData_inpEmrPhraseCatagoryIdNo0 = {
         inpEmrPhraseShareId: null,
         mrtEditorTypeCode: '399461576',
         inpatientEmrPhraseContent: {
-          inpEmrPhraseContentId: '167375111701323777',
-          inpEmrPhraseId: '167375023654494208',
-          inpEmrPhraseContentData:
-            'QlpoOTFBWSZTWThpOuwAAUifgAIL//I/d8/Av+ff8FAD2PUAEgChgAAAANAAAAABgAAAANAAAAAAk1IhNQmDRDEwAjRoNHoTAYAAAADQAAAAAFSRAkwQGiaepiZTEPSDQwaJvASb4EmmaCIIkSSMiArFiSEWMVgIgxgkVCSCyIwUiJIsURkUkhNbufw6vGkC93740OJf108EJeYU58odDWscMNL5KXo21JDdnN2Ur6y9/nhwbm64OP6lqjhSNHjt1a7RV6tbRWTYLgZ5Z2zlTNua2x2rvWpZgsczU73eu6FNGLoeBoYORg7jBSzNZwbGTFra125yPDPJTW8GpZg3NvK2TZxs26LOG96NG97HTEM1drkSJIyqT+6spJHSU0lPNZ8XkyXsxl1uHlc8gkxSYequQxYNKWYtV7Ly0blQuydGqQkjBUJNzH9F0mmNL7cESzBGxi52JJDMa8lg7WxqbrO1is1tbDNinZfJS6zWzUGvSyXYWTBR6vsyxqcfbn9B5Pw4+I+eOoScqc6m8jsndKqlLt7ExQ8MsrYvCIPGocPtjln8CrbBJ5trW2uSmWep+O7bCTIpG9VIKbKaSaJ9BdOLN95iyUprWt1Z1bSd5VlU1zIlrehVeg1mYxMTzNRhjgYCjVnHlrC+xa1nliSsv6YVoho48qaTvNZ1H2zmvFnZFrWbOZ8U3eE+qa56eTh6PsYuepnHWciXZv+T39ydmxtT/VmJ+/I0zYPco5tVfhNOV+epWNp53yuvdaViw/kZZsWZZ6dCcr3Pe0iNrbBtndYXS/jRudT1tDNdk4yPw6uxvdc67dkv0Ksl1SzdOV3uEM3FTi3q53KmDpfOzRdbN0Jm3fee06YijvYOtXepTrWcJSpe8SpQu+Tveov8lqZm1mtUGAqWWlodTnOHeeb5HTqPDqFStJ8GyzqHg5pvRipVo55dqTBZme58brwqpVZWWt4uHV+V14exsLsakuxSmlnyaEOQoEZOkidJbILTf262TZMXEpld1nemYze5gPoOZOZyP2bzxNv1cVPNtfw2UKtI95zhoP/F3JFOFCQOGk67AA==',
-          inpEmrPhraseContentTxt: '个人短语JWS003 分享给消化内科',
-          compressedFlag: null,
-        },
-      },
-      {
-        inpEmrPhraseId: '167375023654494208',
-        inpEmrPhraseCatagoryId: '4',
-        inpEmrPhraseName: 'JWS003',
-        inpEmrPhraseScopeCode: '959739',
-        enabledFlag: '98360',
-        seqNo: 0,
-        deptId: '57397236357130241',
-        createdBy: '57393746696202243',
-        inpEmrPhraseShareId: null,
-        mrtEditorTypeCode: '399461576',
-        inpatientEmrPhraseContent: {
           inpEmrPhraseContentId: '167375163240931329',
           inpEmrPhraseId: '167375023654494208',
           inpEmrPhraseContentData:

@@ -1,19 +1,9 @@
+import { patientData1, patientData2 } from './patientData'
 export default {
   namespaced: true,
   state: {
     //总患者列表
-    patientList: [
-      {
-        name: '患者1',
-        encounterId: 1,
-        bizRoleId: 1,
-      },
-      {
-        name: '患者2',
-        encounterId: 2,
-        bizRoleId: 2,
-      },
-    ],
+    patientList: [patientData1.data, patientData2.data],
     cachePatientList: [], //缓存的患者列表
     currentActiveLoadedPatient: {}, //当前激活的患者
     maxCache: 10, //最大缓存的患者数
