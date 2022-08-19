@@ -20,7 +20,7 @@ export default {
   watch: {},
   created() {
     this.eventHubHelper = getEventHubHelper(
-      this.patientRootComponentStore.state.eventHub
+      this.$patientRootComponentStore.state.eventHub
     )
   },
   mounted() {},
@@ -33,7 +33,7 @@ export default {
         type: 'text',
         content: str,
         encounterId:
-          this.patientRootComponentStore.currentPatientInfo?.encounterId,
+          this.$patientRootComponentStore.currentPatientInfo?.encounterId,
       })
     },
   },

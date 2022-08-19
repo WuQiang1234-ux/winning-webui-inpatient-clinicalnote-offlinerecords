@@ -11,7 +11,7 @@
         @tab-click="handleTabClick"
       >
         <el-tab-pane
-          v-for="item in patientRootComponentStore.state.multi_clinicalnote_board_state.loadedClinicalnoteList"
+          v-for="item in $patientRootComponentStore.state.multi_clinicalnote_board_state.loadedClinicalnoteList"
           :key="item.id"
           :label="item.title"
           :name="item.id"
@@ -107,7 +107,7 @@ export default {
     currentId: {
       get() {
         return (
-          this.patientRootComponentStore.state.multi_clinicalnote_board_state
+          this.$patientRootComponentStore.state.multi_clinicalnote_board_state
             .currentActiveLoadedClinicalnote?.id ?? ''
         )
       },
@@ -116,7 +116,7 @@ export default {
   },
   created() {
     this.eventHubHelper = getEventHubHelper(
-      this.patientRootComponentStore.state.eventHub
+      this.$patientRootComponentStore.state.eventHub
     )
   },
   mounted() {},
@@ -127,32 +127,32 @@ export default {
       //   return v.id == id
       // })
       console.log(
-        this.patientRootComponentStore.getters[
+        this.$patientRootComponentStore.getters[
           'multi_clinicalnote_board_state/loadedClinicalnoteIdList'
         ]
       )
       let _index =
-        this.patientRootComponentStore.getters[
+        this.$patientRootComponentStore.getters[
           'multi_clinicalnote_board_state/loadedClinicalnoteIdList'
         ].indexOf(id)
-      this.patientRootComponentStore.commit(
+      this.$patientRootComponentStore.commit(
         'multi_clinicalnote_board_state/deleteInLoadedClinicalnoteListById',
         id
       )
       if (
-        this.patientRootComponentStore.state.multi_clinicalnote_board_state
+        this.$patientRootComponentStore.state.multi_clinicalnote_board_state
           .currentActiveLoadedClinicalnote.id == id
       ) {
         if (_index - 1 >= 0) {
-          this.patientRootComponentStore.commit(
+          this.$patientRootComponentStore.commit(
             'multi_clinicalnote_board_state/setCurrentActiveClinicalnoteById',
-            this.patientRootComponentStore.state.multi_clinicalnote_board_state
+            this.$patientRootComponentStore.state.multi_clinicalnote_board_state
               .loadedClinicalnoteIdList[_index - 1]
           )
         } else {
-          this.patientRootComponentStore.commit(
+          this.$patientRootComponentStore.commit(
             'multi_clinicalnote_board_state/setCurrentActiveClinicalnoteById',
-            this.patientRootComponentStore.getters[
+            this.$patientRootComponentStore.getters[
               'multi_clinicalnote_board_state/loadedClinicalnoteIdList'
             ][0]
           )
@@ -160,11 +160,11 @@ export default {
       }
 
       if (
-        this.patientRootComponentStore.getters[
+        this.$patientRootComponentStore.getters[
           'multi_clinicalnote_board_state/loadedClinicalnoteIdList'
         ].length == 0
       ) {
-        this.patientRootComponentStore.commit(
+        this.$patientRootComponentStore.commit(
           'multi_clinicalnote_board_state/clearLoadedClinicalnoteList'
         )
       }
@@ -175,7 +175,7 @@ export default {
       //2.激活的是住院病历首页直接关闭
       //3.激活的会诊记录直接关闭
       let { type } =
-        this.patientRootComponentStore.state.multi_clinicalnote_board_state
+        this.$patientRootComponentStore.state.multi_clinicalnote_board_state
           .currentActiveLoadedClinicalnote
       // console.log(this.currentId, id)
       // debugger
@@ -200,30 +200,30 @@ export default {
           () => {
             this.handleDoDelete(id)
           },
-          this.patientRootComponentStore.state.currentPatientInfo?.encounterId
+          this.$patientRootComponentStore.state.currentPatientInfo?.encounterId
         )
       }
     },
     handleTabClick(tab) {
       if (
         tab.name ==
-        this.patientRootComponentStore.getters[
+        this.$patientRootComponentStore.getters[
           'multi_clinicalnote_board_state/currentActiveLoadedClinicalnoteId'
         ]
       )
         return
-      this.patientRootComponentStore.commit(
+      this.$patientRootComponentStore.commit(
         'multi_clinicalnote_board_state/setCurrentActiveClinicalnoteById',
         tab.name
       )
       if (
-        this.patientRootComponentStore.getters[
+        this.$patientRootComponentStore.getters[
           'multi_clinicalnote_board_state/currentActiveLoadedClinicalnoteId'
         ].includes('readonly')
       )
         return
       let currentClinicalnote =
-        this.patientRootComponentStore.state.multi_clinicalnote_board_state
+        this.$patientRootComponentStore.state.multi_clinicalnote_board_state
           .loadedClinicalnoteList[tab.index]
       let id = this.getEmrSetId(currentClinicalnote)
       console.log(

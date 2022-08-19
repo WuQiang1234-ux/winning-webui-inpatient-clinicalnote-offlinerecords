@@ -150,7 +150,7 @@ export default {
       return editorId
     },
     patientInfoGetter() {
-      return this.patientRootComponentStore?.state?.currentPatientInfo
+      return this.$patientRootComponentStore?.state?.currentPatientInfo
     },
     userInfoGetter() {
       const userInfo = this.userInfo

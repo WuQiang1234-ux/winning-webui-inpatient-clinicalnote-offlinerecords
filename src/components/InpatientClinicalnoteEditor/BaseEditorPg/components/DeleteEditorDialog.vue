@@ -75,7 +75,7 @@ export default {
   watch: {},
   created() {
     this.eventHubHelper = getEventHubHelper(
-      this.patientRootComponentStore.state.eventHub
+      this.$patientRootComponentStore.state.eventHub
     )
   },
   mounted() {

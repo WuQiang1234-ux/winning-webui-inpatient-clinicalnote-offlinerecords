@@ -13,26 +13,27 @@ let mixin = {
   },
   computed: {
     currentEmrSetId() {
-      return this.patientRootComponentStore.state.multi_clinicalnote_board_state
-        .currentActiveLoadedClinicalnote?.options?.content?.emrSetId
+      return this.$patientRootComponentStore.state
+        .multi_clinicalnote_board_state.currentActiveLoadedClinicalnote?.options
+        ?.content?.emrSetId
     },
     currentPatientInfo() {
-      return this.patientRootComponentStore.state.currentPatientInfo
+      return this.$patientRootComponentStore.state.currentPatientInfo
     },
   },
   watch: {
-    'patientRootComponentStore.multi_clinicalnote_board_state.currentActiveLoadedClinicalnote.id'(
+    '$patientRootComponentStore.multi_clinicalnote_board_state.currentActiveLoadedClinicalnote.id'(
       v
     ) {
       if (v) {
         console.log(
           '改了',
-          this.patientRootComponentStore.state.multi_clinicalnote_board_state
+          this.$patientRootComponentStore.state.multi_clinicalnote_board_state
         )
         // if (this.activateMenu == 'emr_tree') {
         this.treeDefaultExpandedKeys = []
         this.treeDefaultExpandedKeys?.push(
-          this.patientRootComponentStore.state.multi_clinicalnote_board_state
+          this.$patientRootComponentStore.state.multi_clinicalnote_board_state
             .currentActiveLoadedClinicalnote.options.content.emrTypeId
         )
         // }
@@ -41,7 +42,7 @@ let mixin = {
   },
   created() {
     this.eventHubHelper = getEventHubHelper(
-      this.patientRootComponentStore.state.eventHub
+      this.$patientRootComponentStore.state.eventHub
     )
   },
   beforeDestroy() {
@@ -88,14 +89,14 @@ let mixin = {
             },
           },
         }
-        console.log(obj, '======0==========', this.patientRootComponentStore)
-        this.patientRootComponentStore.commit(
+        console.log(obj, '======0==========', this.$patientRootComponentStore)
+        this.$patientRootComponentStore.commit(
           'multi_clinicalnote_board_state/addToLoadedClinicalnoteList',
           obj
         )
       }
 
-      this.patientRootComponentStore.commit(
+      this.$patientRootComponentStore.commit(
         'multi_clinicalnote_board_state/setCurrentActiveClinicalnoteById',
         id
       )
@@ -138,17 +139,17 @@ let mixin = {
             },
           },
         }
-        this.patientRootComponentStore.commit(
+        this.$patientRootComponentStore.commit(
           'multi_clinicalnote_board_state/addToLoadedClinicalnoteList',
           obj
         )
       }
-      this.patientRootComponentStore.commit(
+      this.$patientRootComponentStore.commit(
         'multi_clinicalnote_board_state/setCurrentActiveClinicalnoteById',
         _uniqueId
       )
       //连续病历更新成当前查看病历的id todo 需要处理
-      this.patientRootComponentStore.commit(
+      this.$patientRootComponentStore.commit(
         'multi_clinicalnote_board_state/setCurrentEmrSetSerialId',
         id
       )
@@ -157,7 +158,7 @@ let mixin = {
     },
     async deleteClinicalnote() {},
     hasInLoadedClinicalnoteList(id) {
-      return this.patientRootComponentStore.state.multi_clinicalnote_board_state.loadedClinicalnoteList.find(
+      return this.$patientRootComponentStore.state.multi_clinicalnote_board_state.loadedClinicalnoteList.find(
         (v) => {
           return v.id == id
         }

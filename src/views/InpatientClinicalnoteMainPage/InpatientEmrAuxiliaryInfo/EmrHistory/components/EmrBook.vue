@@ -129,7 +129,7 @@ export default {
   mounted() {
     this.getClassificationList()
     this.eventHubHelper = getEventHubHelper(
-      this.patientRootComponentStore.state.eventHub
+      this.$patientRootComponentStore.state.eventHub
     )
   },
   methods: {

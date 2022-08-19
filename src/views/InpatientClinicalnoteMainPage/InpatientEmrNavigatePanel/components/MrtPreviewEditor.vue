@@ -165,7 +165,7 @@ export default {
   },
   computed: {
     currentPatientInfo() {
-      return this.patientRootComponentStore.currentPatientInfo
+      return this.$patientRootComponentStore.currentPatientInfo
     },
   },
 }

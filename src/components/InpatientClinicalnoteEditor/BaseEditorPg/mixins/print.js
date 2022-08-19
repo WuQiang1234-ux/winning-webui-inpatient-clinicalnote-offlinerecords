@@ -11,7 +11,7 @@ let mixin = {
   },
   computed: {
     currentPatientInfo() {
-      return this.patientRootComponentStore.state.currentPatientInfo
+      return this.$patientRootComponentStore.state.currentPatientInfo
     },
     ...mapState([
       // 'qualityControlData',

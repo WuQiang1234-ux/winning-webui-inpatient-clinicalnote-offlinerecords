@@ -1,7 +1,7 @@
 <template>
   <div class="inpatient-emr-edit-area-wrap">
     <MultiClinicalnoteBoard
-      v-show="this.patientRootComponentStore.state.multi_clinicalnote_board_state.loadedClinicalnoteList.length"
+      v-show="this.$patientRootComponentStore.state.multi_clinicalnote_board_state.loadedClinicalnoteList.length"
     />
   </div>
 </template>

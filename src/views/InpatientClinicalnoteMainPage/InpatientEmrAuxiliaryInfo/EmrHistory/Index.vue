@@ -142,7 +142,7 @@ export default {
   computed: {
     ...mapState(['userInfo']),
     currentPatientInfo() {
-      return this.patientRootComponentStore.state.currentPatientInfo
+      return this.$patientRootComponentStore.state.currentPatientInfo
     },
 
     isShow5XClinicanote() {

@@ -174,7 +174,7 @@ export default {
   computed: {
     ...mapState(['orgInfo']),
     currentPatientInfo() {
-      return this.patientRootComponentStore.state.currentPatientInfo
+      return this.$patientRootComponentStore.state.currentPatientInfo
     },
     currentClinicalnoteTemplateClassDataId() {
       return this.selectedTemplateList.map((el) => el.keyId)
@@ -195,7 +195,7 @@ export default {
   created() {},
   mounted() {
     this.eventHubHelper = getEventHubHelper(
-      this.patientRootComponentStore.state.eventHub
+      this.$patientRootComponentStore.state.eventHub
     )
     this.handleDialogOpen()
   },

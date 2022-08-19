@@ -156,7 +156,7 @@ export default {
   },
   created() {
     this.eventHubHelper = getEventHubHelper(
-      this.patientRootComponentStore.state.eventHub
+      this.$patientRootComponentStore.state.eventHub
     )
     this.pgEditor = null
   },

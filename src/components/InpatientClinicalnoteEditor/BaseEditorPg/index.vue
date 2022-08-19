@@ -156,7 +156,7 @@ export default {
   computed: {
     ...mapState(['userInfo', 'orgInfo']),
     currentPatientInfo() {
-      return this.patientRootComponentStore.state.currentPatientInfo
+      return this.$patientRootComponentStore.state.currentPatientInfo
     },
     currentDocId() {
       return this.clinicalnoteData.content.emrSetId.replace('readonly', '')
@@ -200,7 +200,7 @@ export default {
   created() {
     console.log('来了created')
     this.eventHubHelper = getEventHubHelper(
-      this.patientRootComponentStore.state.eventHub
+      this.$patientRootComponentStore.state.eventHub
     )
     this.currentDocIdWatch = this.$watch(
       'currentDocId',
@@ -355,7 +355,7 @@ export default {
         // debugger
         if (subDocId !== this.currentDocId) {
           this.isRelocate = false
-          this.patientRootComponentStore.commit(
+          this.$patientRootComponentStore.commit(
             'multi_clinicalnote_board_state/setCurrentEmrSetSerialId',
             subDocId
           )
@@ -401,7 +401,7 @@ export default {
 
       if (
         this.currentDocId !==
-        this.patientRootComponentStore.state.multi_clinicalnote_board_state
+        this.$patientRootComponentStore.state.multi_clinicalnote_board_state
           .currentActiveLoadedClinicalnote.options.content.emrSetId
       ) {
         console.log('非当前激活的病历不更新')

@@ -9,8 +9,8 @@ function vuexInit() {
   // store injection
 
   if (options.name == 'patientRootComponent') {
-    this.patientRootComponentStore = patientRootComponentStore()
-  } else if (options.parent && options.parent.patientRootComponentStore) {
-    this.patientRootComponentStore = options.parent.patientRootComponentStore
+    this.$patientRootComponentStore = patientRootComponentStore()
+  } else if (options.parent && options.parent.$patientRootComponentStore) {
+    this.$patientRootComponentStore = options.parent.$patientRootComponentStore
   }
 }

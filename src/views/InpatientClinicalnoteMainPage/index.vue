@@ -60,7 +60,7 @@ export default {
     }
   },
   created() {
-    this.patientRootComponentStore.commit(
+    this.$patientRootComponentStore.commit(
       'setCurrentPatientInfo',
       this.particulars
     )

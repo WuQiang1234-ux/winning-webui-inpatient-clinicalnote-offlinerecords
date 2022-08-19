@@ -167,8 +167,8 @@ export default {
   },
   computed: {
     currentActiveLoadedClinicalnote() {
-      return this.patientRootComponentStore.state.multi_clinicalnote_board_state
-        .currentActiveLoadedClinicalnote
+      return this.$patientRootComponentStore.state
+        .multi_clinicalnote_board_state.currentActiveLoadedClinicalnote
     },
     ...mapState(['userInfo', 'orgInfo', 'currentPatientInfo']),
     pages() {
@@ -200,7 +200,7 @@ export default {
   mounted() {
     // this.registerEventBus()
     this.eventHubHelper = getEventHubHelper(
-      this.patientRootComponentStore.state.eventHub
+      this.$patientRootComponentStore.state.eventHub
     )
   },
   beforeDestroy() {

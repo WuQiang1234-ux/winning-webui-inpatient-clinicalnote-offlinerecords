@@ -140,7 +140,7 @@ export default {
   mounted() {
     this.getClinicalnoteTree()
     this.eventHubHelper = getEventHubHelper(
-      this.patientRootComponentStore.state.eventHub
+      this.$patientRootComponentStore.state.eventHub
     )
 
     const eventHubHelper = this.eventHubHelper
@@ -179,7 +179,7 @@ export default {
       })
     },
     handleAddClinicalnote(data) {
-      this.patientRootComponentStore.commit('emr/showEmrCreateDialog', {
+      this.$patientRootComponentStore.commit('emr/showEmrCreateDialog', {
         defaultTemplateClassId: data.rawData.inpatientEmrTypeId,
       })
     },
