@@ -236,7 +236,7 @@ export default {
         })
 
         //水印
-        pgEditor.setWaterMark()
+        // pgEditor.setWaterMark()
         pgEditor.eventEmitter.$on(
           EditorEvent.PG_EVENT_ON_CURSOR_CHANGED,
           this.handleDocumentClick

@@ -402,7 +402,7 @@ export default {
       })
       console.log('jiazai wancheng ---------- ')
       //水印
-      pgEditor.setWaterMark()
+      // pgEditor.setWaterMark()
       setTimeout(() => {
         pgEditor.switchContentRenderMode(
           DcEditorRenderModes.SET_WORK_MODE_BROWSE

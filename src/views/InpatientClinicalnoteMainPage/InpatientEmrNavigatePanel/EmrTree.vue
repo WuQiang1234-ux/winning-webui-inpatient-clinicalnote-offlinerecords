@@ -103,6 +103,8 @@
 </template>
 
 <script>
+import $ from 'jquery'
+
 import dayjs from 'dayjs'
 import { statusText } from '@/utils/enumerate.js'
 import { debounce } from '@/utils/index'
@@ -126,7 +128,14 @@ export default {
     }
   },
   computed: {},
-  watch: {},
+  watch: {
+    currentEmrSetId(v) {
+      this.$refs.clinicalnoteTreeRef.setCurrentKey(v)
+      // 更换成编辑图标
+      this.NewAndChangedIcon()
+      this.setScrollBarPosition()
+    },
+  },
   created() {},
   mounted() {
     this.getClinicalnoteTree()
@@ -145,6 +154,30 @@ export default {
     this.eventHubHelper.destroy()
   },
   methods: {
+    setScrollBarPosition() {
+      if (this.activateMenu !== 'emr_tree') return
+      this.$nextTick(() => {
+        setTimeout(() => {
+          let rectElement = $(this.$el).find('.is-current')
+          let boxRectElement = $(this.$parent.$el).find(
+            '.inpatient-emr-navigate-panel-body'
+          )
+          if (rectElement.length == 0 || boxRectElement.length == 0) return
+          let rect = rectElement[0].getBoundingClientRect()
+          let boxRect = boxRectElement[0].getBoundingClientRect()
+          console.log('setScrollBarPosition-tree', rect, boxRect)
+          if (rect.bottom > boxRect.bottom) {
+            let oldScrollTop = boxRectElement.scrollTop()
+            boxRectElement.scrollTop(
+              oldScrollTop + rect.bottom + rect.height - boxRect.bottom
+            )
+          } else if (rect.top < boxRect.top) {
+            let oldScrollTop = boxRectElement.scrollTop()
+            boxRectElement.scrollTop(oldScrollTop - boxRect.top + rect.top)
+          }
+        }, 1000)
+      })
+    },
     handleAddClinicalnote(data) {
       this.patientRootComponentStore.commit('emr/showEmrCreateDialog', {
         defaultTemplateClassId: data.rawData.inpatientEmrTypeId,

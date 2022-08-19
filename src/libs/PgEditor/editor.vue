@@ -10,7 +10,7 @@
 <script>
 /* eslint-disable no-undef */
 // import api from '@/api/list'
-// import $ from 'jquery'
+import $ from 'jquery'
 import EditorToolbar from './editor_toolbar'
 // import AllographDialog from './components/AllographDialog.vue'
 import { ClassNamespace, EditorEvent, DataElementWinIds } from './constants'

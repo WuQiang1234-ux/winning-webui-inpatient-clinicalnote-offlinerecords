@@ -163,6 +163,29 @@ let mixin = {
         }
       )
     },
+    //编辑时图标更新设置
+    handleIconChange(el) {
+      if (el.id == this.currentEmrSetId) {
+        if (
+          el.currentStatusCode == '960074' ||
+          el.currentStatusCode == '390030405'
+        ) {
+          el.currentStatusCode = '1001'
+        }
+      } else {
+        //还原未激活图标
+        el.currentStatusCode = el.defaultStatusCode
+      }
+    },
+    NewAndChangedIcon() {
+      this.clinicalnoteTreeData.forEach((el) => {
+        if (el.children.length) {
+          el.children.forEach((ele) => {
+            this.handleIconChange(ele)
+          })
+        }
+      })
+    },
     async handleDeleteClinicalnote(data1) {
       data1.loading = true
       try {
