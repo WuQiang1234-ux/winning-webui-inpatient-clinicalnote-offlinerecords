@@ -1,7 +1,3 @@
 config/
-public/
 dist/
-static/
-src/assets/icon/*.js
-src/event-monitor/
 node_modules
